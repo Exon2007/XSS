@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport XSS - Faille HTML détectée</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.5;
+      text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    }
+
+    .warning {
+      color: #ff0;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px auto;
+        padding: 10px;
+      }
+      pre {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+  <pre id="output"></pre>
+</div>
+
+<script>
+  // Matrix background - optimized
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+  
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initMatrix();
+  }
+  
+  window.addEventListener('resize', resizeCanvas);
+  
+  const chars = "01";
+  const fontSize = 14;
+  let columns, drops;
+  
+  function initMatrix() {
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array(columns).fill(1);
+  }
+  
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0f0";
+    ctx.font = `${fontSize}px monospace`;
+    
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  // Initialize
+  resizeCanvas();
+  const matrixInterval = setInterval(drawMatrix, 33);
+
+  // Typing effect with improved timing
+  const lines = [
+    "Explication : Faille dans le html de cette page :",
+    "La page html en particulier possède des points d'injection...",
+    "Résultat :",
+    "  → XSS stocké détecté dans une balise",
+    "  → L'exploit suivant est interprété côté client : <!-- <payload> -->",
+    "",
+    "La plus part des pages du site sont temporairement compromises.",
+    "",
+    "[DISCLAIMER] Ceci est une simulation. Aucune donnée réelle n'a été compromise ni partagé",
+    "",
+    "<span class='warning'>Contact : exon038@gmail.com</span>"
+  ];
+
+  const output = document.getElementById('output');
+  let lineIndex = 0;
+  let typing = false;
+
+  function typeLine(text, callback) {
+    if (typing) return;
+    typing = true;
+    
+    let i = 0;
+    const interval = setInterval(() => {
+      // Handle HTML tags
+      if (text.charAt(i) === '<') {
+        const tagEnd = text.indexOf('>', i);
+        if (tagEnd !== -1) {
+          output.innerHTML += text.substring(i, tagEnd + 1);
+          i = tagEnd;
+        }
+      } else {
+        output.innerHTML += text.charAt(i);
+      }
+      
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        output.innerHTML += '\n';
+        typing = false;
+        if (callback) callback();
+      }
+    }, Math.random() * 10 + 15);
+  }
+
+  function nextLine() {
+    if (lineIndex < lines.length) {
+      typeLine(lines[lineIndex], () => {
+        lineIndex++;
+        setTimeout(nextLine, lineIndex % 3 === 0 ? 800 : 400);
+      });
+    }
+  }
+
+  // Start the effect after short delay
+  setTimeout(nextLine, 500);
+  
+  // Cleanup on exit
+  window.addEventListener('beforeunload', () => {
+    clearInterval(matrixInterval);
+  });
+</script>
+
+</body>
+</html>
