@@ -1,59 +1,90 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Page musicale</title>
+  <meta charset="UTF-8" />
+  <title>Musique — Hitbox invisible</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
+      margin: 0; font-family: system-ui, sans-serif;
+      min-height: 100vh; display: grid; place-items: center;
       background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: white;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      color: #fff;
     }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
+    h1 { margin: 0 0 0.5rem }
+    p { opacity: 0.85; margin: 0 0 1.5rem }
+
+    /* Overlay = hitbox géante et invisible */
+    .sound-overlay {
+      position: fixed; inset: 0;
+      background: transparent;   /* invisible */
+      display: grid; place-items: center;
+      cursor: pointer;           /* indique qu'on peut cliquer */
+      z-index: 9999;
     }
-    #startBtn {
-      padding: 12px 25px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      background: #ffcc00;
-      color: #333;
-      cursor: pointer;
-      transition: 0.3s;
+
+    /* Bouton visible (facultatif) — le clic marche aussi en dehors */
+    .btn {
+      padding: 12px 22px; border: 0; border-radius: 999px;
+      background: #ffcc00; color: #222; font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
     }
-    #startBtn:hover {
-      background: #ffdb4d;
-    }
+    .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .hint { font-size: .9rem; opacity: .9; margin-top: .75rem }
   </style>
 </head>
 <body>
-  <h1>Bienvenue 🎶</h1>
-  <p>Clique sur le bouton pour activer la musique</p>
-  
-  <button id="startBtn">▶ Lancer la musique</button>
+  <main>
+    <h1>Bienvenue 🎶</h1>
+    <p>Musique de fond (démarre à 1:15 après votre clic)</p>
+  </main>
 
-  <!-- Musique en arrière-plan (chargée muette) -->
-  <audio id="bgMusic" autoplay loop muted>
+  <!-- Audio préchargé, muet par défaut -->
+  <audio id="bgMusic" preload="auto" loop muted>
     <source src="musique.mp3" type="audio/mpeg">
-    Ton navigateur ne supporte pas l'audio HTML5.
   </audio>
 
-  <script>
-    const btn = document.getElementById("startBtn");
-    const audio = document.getElementById("bgMusic");
+  <!-- Overlay = hitbox plein écran, mais on affiche un bouton au centre -->
+  <div id="soundOverlay" class="sound-overlay"
+       role="button"
+       aria-label="Activer le son (cliquer n'importe où)">
+    <div style="text-align:center;">
+      <button class="btn" type="button">🔊 Activer le son</button>
+      <div class="hint">(vous pouvez aussi cliquer n’importe où)</div>
+    </div>
+  </div>
 
-    btn.addEventListener("click", () => {
-      audio.muted = false;   // enlève le mode muet
-      audio.play();          // lance la musique
-      btn.style.display = "none"; // cache le bouton
+  <script>
+    const overlay = document.getElementById('soundOverlay');
+    const audio   = document.getElementById('bgMusic');
+
+    async function enableSound() {
+      try {
+        // Place le curseur à 1:15 (75s) au premier geste utilisateur
+        // On attend metadata si nécessaire
+        if (isNaN(audio.duration) || audio.duration === Infinity) {
+          await new Promise(resolve => {
+            const onMeta = () => { audio.removeEventListener('loadedmetadata', onMeta); resolve(); };
+            audio.addEventListener('loadedmetadata', onMeta, { once: true });
+          });
+        }
+        audio.currentTime = Math.min(75, (audio.duration || 1) - 0.1); // sécurité si durée < 75s
+        audio.muted = false;
+        await audio.play();
+      } catch(e) {
+        // Si le play échoue, on reste muet et on réessaie au prochain clic
+        console.warn('Lecture bloquée :', e);
+        return;
+      }
+      // Retire la hitbox géante après succès
+      overlay.remove();
+    }
+
+    // Un clic n'importe où sur l'overlay déclenche l'activation
+    overlay.addEventListener('click', enableSound);
+    // Accessibilité clavier
+    overlay.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enableSound(); }
     });
   </script>
 </body>
