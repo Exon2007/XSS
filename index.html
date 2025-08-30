@@ -2,24 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dubstep Hacking Lyrics</title>
+<title>Hacking Lyrics with Transition</title>
 <style>
   body {
     margin:0; padding:0; overflow:hidden;
-    background:#000; color:#0f0;
+    background:#fff; /* écran blanc au départ */
     font-family: "Courier New", monospace;
+    color:#0f0;
   }
 
-  /* Hitbox plein écran invisible pour cliquer */
+  /* Hitbox plein écran pour cliquer */
   #overlay {
     position:fixed; inset:0;
-    background:#000;
+    background:#fff; /* commence blanc */
     display:flex; justify-content:center; align-items:center;
     cursor:pointer; z-index:9999;
-    transition: background 0.8s ease;
+    transition: background 2s ease; /* transition vers noir */
   }
 
-  /* Texte de la phrase */
+  #overlayText {
+    font-size:1.2rem;
+    color:#000;
+  }
+
+  /* Texte style hacking */
   #lyrics {
     position:absolute; top:50%; left:50%;
     transform:translate(-50%,-50%);
@@ -31,9 +37,7 @@
 <body>
 
 <div id="overlay">
-  <div style="text-align:center;">
-    <div style="color:#0f0; font-size:1.2rem;">Cliquez pour activer la musique</div>
-  </div>
+  <div id="overlayText">Cliquez pour activer la musique</div>
 </div>
 
 <div id="lyrics"></div>
@@ -44,6 +48,7 @@
 
 <script>
 const overlay = document.getElementById('overlay');
+const overlayText = document.getElementById('overlayText');
 const audio = document.getElementById('song');
 const lyricsDiv = document.getElementById('lyrics');
 
@@ -55,14 +60,17 @@ const lyricEnd = 87;     // 1:27
 const lyricDuration = lyricEnd - lyricStart;
 
 overlay.addEventListener('click', async () => {
-  // Effet TV éteinte : transition écran noir
+  // Transition écran blanc → noir
   overlay.style.background = "#000";
-  overlay.innerHTML = ""; // retire le texte
+  overlayText.style.color = "#0f0"; // texte vert type hacking
+
   // Lecture audio
   audio.currentTime = musicStart;
   audio.muted = false;
   await audio.play();
-  overlay.remove(); // supprime l'overlay
+
+  // Supprime le texte d’instruction après transition
+  setTimeout(() => overlay.remove(), 2000); // laisse 2s pour la transition
 
   // Boucle pour les lyrics
   audio.addEventListener("timeupdate", () => {
