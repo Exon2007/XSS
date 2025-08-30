@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Page avec musique</title>
-</head>
-<body>
-  <h1>Bienvenue sur ma page 🎵</h1>
+<audio id="bgMusic" autoplay loop muted>
+  <source src="musique.mp3" type="audio/mpeg">
+</audio>
 
-  <!-- Musique en arrière-plan -->
-  <audio autoplay loop>
-    <source src="musique.mp3" type="audio/mpeg">
-    Votre navigateur ne supporte pas l'audio HTML5.
-  </audio>
-</body>
-</html>
+<button onclick="document.getElementById('bgMusic').muted=false;">
+  🔊 Activer le son
+</button>
