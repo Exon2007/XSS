@@ -8,6 +8,7 @@ body {
   margin:0; padding:0; overflow:hidden;
   background:#000;
   font-family: "Courier New", monospace;
+  transition: background 1s ease-in-out;
 }
 
 /* Overlay */
@@ -49,10 +50,7 @@ body {
   display:flex; gap:0.5rem;
   opacity:0; z-index:3000;
 }
-#exon span {
-  display:inline-block;
-  opacity:1;
-}
+#exon span { display:inline-block; }
 
 /* Animations */
 .slowLeft {
@@ -134,13 +132,16 @@ overlay.addEventListener('click', async () => {
     // EXON animation
     if (t >= exonTime && !exonPlayed) {
       exonPlayed = true;
-      exon.style.opacity = "1";
+
+      // change fond en blanc
+      document.body.style.background = "#fff";
 
       // Barres ciné
       topBar.style.top = "0";
       bottomBar.style.bottom = "0";
 
-      // Toutes les lettres apparaissent direct en noir
+      // EXON apparaît d'un coup
+      exon.style.opacity = "1";
       E.classList.add("slowLeft");
       X.classList.add("slowLeft");
       O.classList.add("slowRight");
