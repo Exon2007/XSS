@@ -2,22 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CRT Glitch Lyrics</title>
+<title>CRT Hack Lyrics</title>
 <style>
 body {
   margin:0; padding:0; overflow:hidden;
-  background:#fff; /* écran blanc initial */
+  background:#000; /* fond noir permanent */
   font-family: "Courier New", monospace;
   color:#0f0;
 }
 
+/* Hitbox plein écran pour cliquer */
 #overlay {
   position:fixed; inset:0;
-  background:#fff;
+  background:#fff; /* écran initial blanc */
   display:flex; justify-content:center; align-items:center;
   cursor:pointer; z-index:9999;
-  transition: background 0.8s ease; /* fade rapide */
-  transform-origin: center;
+  transition: background 0.8s ease;
+  transform-origin:center;
 }
 
 #overlayText {
@@ -25,26 +26,29 @@ body {
   color:#000;
 }
 
+/* Texte style terminal / hacking */
 #lyrics {
   position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%) rotateX(5deg) rotateY(5deg); /* angles initiaux */
+  transform:translate(-50%,-50%) rotateX(5deg) rotateY(5deg);
   font-size:2rem; line-height:1.5; white-space:pre-wrap;
   letter-spacing:2px;
-  text-shadow:0 0 1px #0f0, 0 0 2px #0f0;
+  text-shadow:0 0 1px #0f0,0 0 2px #0f0;
   filter: contrast(1.5) brightness(1.1);
 }
 
-/* scanlines */
-#lyrics::before {
-  content:""; position:absolute; inset:0;
+/* Scanlines overlay pour effet CRT */
+#screenEffect {
+  position:fixed; inset:0;
+  pointer-events:none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(0,0,0,0.05),
-    rgba(0,0,0,0.05) 1px,
+    rgba(0,255,0,0.05),
+    rgba(0,255,0,0.05) 1px,
     transparent 1px,
     transparent 3px
   );
-  pointer-events:none;
+  mix-blend-mode: screen;
+  z-index:998;
 }
 </style>
 </head>
@@ -55,6 +59,7 @@ body {
 </div>
 
 <div id="lyrics"></div>
+<div id="screenEffect"></div>
 
 <audio id="song" preload="auto">
   <source src="musique.mp3" type="audio/mpeg">
@@ -65,6 +70,7 @@ const overlay = document.getElementById('overlay');
 const overlayText = document.getElementById('overlayText');
 const audio = document.getElementById('song');
 const lyricsDiv = document.getElementById('lyrics');
+const screenEffect = document.getElementById('screenEffect');
 
 const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
 
@@ -73,47 +79,55 @@ const lyricStart = 82.5; // 1:22.5
 const lyricEnd = 87;     // 1:27
 const lyricDuration = lyricEnd - lyricStart;
 
-// fonction glitch aléatoire
-function glitchEffect() {
-  const x = (Math.random()-0.5)*5;
-  const y = (Math.random()-0.5)*5;
-  lyricsDiv.style.transform = `translate(-50%,-50%) rotateX(${x}deg) rotateY(${y}deg)`;
-  // glitch rapide seulement pendant fade
-  if(!overlayGone) requestAnimationFrame(glitchEffect);
-}
-
 let overlayGone = false;
 
-overlay.addEventListener('click', async () => {
-  // déclenche glitch
-  glitchEffect();
+// Glitch / tremblement CRT
+function crtGlitch() {
+  if (overlayGone) return;
+  const x = (Math.random()-0.5)*4;
+  const y = (Math.random()-0.5)*4;
+  const z = (Math.random()-0.5)*0.5;
+  lyricsDiv.style.transform = `translate(-50%,-50%) rotateX(${x}deg) rotateY(${y}deg) skew(${z}deg, ${z}deg)`;
+  requestAnimationFrame(crtGlitch);
+}
 
-  // fade rapide vers noir
+// Petit flicker / bruit sur scanlines
+function scanlineFlicker() {
+  if (overlayGone) return;
+  screenEffect.style.opacity = 0.03 + Math.random()*0.07;
+  requestAnimationFrame(scanlineFlicker);
+}
+
+overlay.addEventListener('click', async () => {
+  overlayGone = false;
+  crtGlitch();
+  scanlineFlicker();
+
+  // fade vers noir rapide
   overlay.style.background = "#000";
   overlayText.style.color = "#0f0";
 
-  // lecture audio
+  // Lecture audio
   audio.currentTime = musicStart;
   audio.muted = false;
   await audio.play();
 
-  // transition angles plus lente vers plat
+  // Transition angles plus lente
   const startTime = performance.now();
-  const duration = 1500; // 1.5s pour applatir angles
+  const duration = 1500; // 1.5s pour aplatir
   function flattenAngles(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed/duration,1);
-    const angle = (1-progress)*5; // de 5deg → 0deg
+    const angle = (1-progress)*5;
     lyricsDiv.style.transform = `translate(-50%,-50%) rotateX(${angle}deg) rotateY(${angle}deg)`;
     if(progress < 1) requestAnimationFrame(flattenAngles);
   }
   flattenAngles(performance.now());
 
-  // supprime overlay après fade
-  setTimeout(()=>{overlay.remove(); overlayGone=true;}, 800); // fade plus court
-  
+  // Supprime overlay après fade
+  setTimeout(()=>{overlay.remove(); overlayGone=true;}, 800);
 
-  // affichage lyrics
+  // Lyrics mot par mot
   audio.addEventListener("timeupdate", () => {
     const t = audio.currentTime;
     if (t >= lyricStart && t <= lyricEnd) {
