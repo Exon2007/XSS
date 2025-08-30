@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CRT Hack Lyrics + EXON</title>
+<title>EXON Cinematic</title>
 <style>
 body {
   margin:0; padding:0; overflow:hidden;
@@ -11,7 +11,7 @@ body {
   color:#0f0;
 }
 
-/* Overlay d’intro */
+/* Overlay */
 #overlay {
   position:fixed; inset:0;
   background:#fff;
@@ -21,38 +21,22 @@ body {
 }
 #overlayText { font-size:1.2rem; color:#000; }
 
-/* Lyrics hacking */
+/* Lyrics */
 #lyrics {
   position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  font-size:2rem; line-height:1.5; white-space:pre-wrap;
-  letter-spacing:2px;
-  text-shadow:0 0 1px #0f0,0 0 2px #0f0;
-  filter: contrast(1.5) brightness(1.1);
+  font-size:2rem; white-space:pre-wrap;
+  letter-spacing:2px; color:#0f0;
+  text-shadow:0 0 2px #0f0,0 0 5px #0f0;
   z-index:1;
 }
 
-/* Scanlines effet CRT */
-#screenEffect {
-  position:fixed; inset:0;
-  pointer-events:none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,0,0.05),
-    rgba(0,255,0,0.05) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  mix-blend-mode: screen;
-  z-index:998;
-}
-
-/* Barres noires cinéma */
+/* Cinéma bars */
 #topBar, #bottomBar {
   position:fixed; left:0; right:0;
   height:20%; background:#000;
   z-index:2000;
-  transition: all 2s ease;
+  transition: all 1.5s ease-in-out;
 }
 #topBar { top:-20%; }
 #bottomBar { bottom:-20%; }
@@ -61,14 +45,45 @@ body {
 #exon {
   position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  font-size:6rem; font-weight:bold;
-  color:#fff;
+  font-size:5rem; font-weight:300; /* plus fin */
+  color:#fff; letter-spacing:1rem;
   display:flex; gap:0.5rem;
   opacity:0; z-index:3000;
 }
 #exon span {
   display:inline-block;
-  transition: transform 2s ease, opacity 2s ease;
+  opacity:0;
+  transform:scale(0.8);
+}
+
+/* Animations */
+.fadeIn {
+  animation: fadeIn 0.8s ease forwards;
+}
+.fadeOutLeft {
+  animation: fadeOutLeft 1.5s ease forwards;
+}
+.fadeOutRight {
+  animation: fadeOutRight 1.5s ease forwards;
+}
+.fadeOutSofterLeft {
+  animation: fadeOutLeft 2.2s ease forwards;
+}
+.fadeOutSofterRight {
+  animation: fadeOutRight 2.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(0.8); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes fadeOutLeft {
+  from { opacity:1; transform:translateX(0) scale(1); }
+  to   { opacity:0; transform:translateX(-300px) scale(0.9); }
+}
+@keyframes fadeOutRight {
+  from { opacity:1; transform:translateX(0) scale(1); }
+  to   { opacity:0; transform:translateX(300px) scale(0.9); }
 }
 </style>
 </head>
@@ -79,7 +94,6 @@ body {
 </div>
 
 <div id="lyrics"></div>
-<div id="screenEffect"></div>
 <div id="topBar"></div>
 <div id="bottomBar"></div>
 <div id="exon">
@@ -95,7 +109,6 @@ body {
 
 <script>
 const overlay = document.getElementById('overlay');
-const overlayText = document.getElementById('overlayText');
 const audio = document.getElementById('song');
 const lyricsDiv = document.getElementById('lyrics');
 
@@ -117,7 +130,6 @@ const exonTime = 78;     // 1:18
 
 overlay.addEventListener('click', async () => {
   overlay.style.background = "#000";
-  overlayText.style.color = "#0f0";
   audio.currentTime = musicStart;
   await audio.play();
   setTimeout(()=> overlay.remove(), 800);
@@ -129,34 +141,29 @@ overlay.addEventListener('click', async () => {
     if (t >= lyricStart && t <= lyricEnd) {
       const elapsed = t - lyricStart;
       const wordIndex = Math.floor((elapsed / lyricDuration) * text.length);
-      lyricsDiv.innerHTML = text.slice(0, wordIndex+1).join(" ");
-    } else if (t < lyricStart) {
-      lyricsDiv.innerHTML = "";
-    } else if (t > lyricEnd) {
-      lyricsDiv.innerHTML = text.join(" ");
+      lyricsDiv.textContent = text.slice(0, wordIndex+1).join(" ");
     }
 
-    // Cinématique EXON à 1:18
+    // EXON animation
     if (t >= exonTime && !exon.classList.contains("played")) {
       exon.classList.add("played");
 
-      // Barres noires qui entrent
+      // Barres ciné
       topBar.style.top = "0";
       bottomBar.style.bottom = "0";
 
-      // Fond déjà noir → ok
+      // Fade in des lettres
+      [E,X,O,N].forEach((l,i)=> {
+        setTimeout(()=> l.classList.add("fadeIn"), i*150);
+      });
 
-      // Affiche EXON
-      exon.style.opacity = 1;
-
-      // Animer lettres
+      // Puis fade out vers directions opposées
       setTimeout(()=>{
-        E.style.transform = "translateX(-200px)";
-        N.style.transform = "translateX(200px)";
-        X.style.transform = "translateX(-80px)";
-        O.style.transform = "translateX(80px)";
-        E.style.opacity = N.style.opacity = X.style.opacity = O.style.opacity = 0;
-      }, 800);
+        E.classList.add("fadeOutLeft");
+        N.classList.add("fadeOutRight");
+        X.classList.add("fadeOutSofterLeft");
+        O.classList.add("fadeOutSofterRight");
+      }, 1200);
     }
   });
 });
