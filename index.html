@@ -1,54 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dubstep Lyrics Sync</title>
-  <style>
-    body { background:#000; color:#fff; font-family:Orbitron, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; }
-    #lyrics { font-size:2rem; text-align:center; line-height:1.5; }
-    .word {
-      opacity:0;
-      display:inline-block;
-      margin:0 4px;
-      animation: pop 0.4s ease forwards;
-    }
-    @keyframes pop {
-      0%   { transform:scale(0.5) rotate(-15deg); opacity:0; color:#fff; }
-      50%  { transform:scale(1.4) rotate(5deg); opacity:1; color:#ff00ff; text-shadow:0 0 20px #ff00ff; }
-      100% { transform:scale(1) rotate(0); color:#00ffff; text-shadow:0 0 40px #00ffff; }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Dubstep Lyrics Dynamic</title>
+<style>
+  body {
+    margin:0; background:#000; display:flex;
+    justify-content:center; align-items:center;
+    height:100vh; font-family: 'Orbitron', sans-serif;
+    overflow:hidden; color:#fff;
+  }
+  #lyrics {
+    font-size:3rem;
+    text-align:center;
+    line-height:1.5;
+    word-wrap: break-word;
+  }
+  .word {
+    display:inline-block;
+    opacity:0;
+    transform:scale(0.5);
+    animation:pop 0.3s ease forwards;
+  }
+  @keyframes pop {
+    0%   { transform:scale(0.5) rotate(-15deg); opacity:0; color:#fff; }
+    50%  { transform:scale(1.5) rotate(5deg); opacity:1; color:#ff00ff; text-shadow:0 0 20px #ff00ff; }
+    100% { transform:scale(1) rotate(0); color:#00ffff; text-shadow:0 0 40px #00ffff; }
+  }
+</style>
 </head>
 <body>
-  <audio id="song" controls>
-    <source src="musique.mp3" type="audio/mpeg">
-  </audio>
-  <div id="lyrics"></div>
 
-  <script>
-    const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
-    const lyricsDiv = document.getElementById("lyrics");
-    const audio = document.getElementById("song");
+<audio id="song" controls>
+  <source src="musique.mp3" type="audio/mpeg">
+</audio>
 
-    audio.addEventListener("timeupdate", () => {
-      const t = audio.currentTime;
-      const start = 22.5;
-      const duration = 6;
-      const end = start + duration;
+<div id="lyrics"></div>
 
-      if (t >= start && t <= end) {
-        const elapsed = t - start;
-        const wordIndex = Math.floor((elapsed / duration) * text.length);
+<script>
+const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
+const lyricsDiv = document.getElementById("lyrics");
+const audio = document.getElementById("song");
 
-        lyricsDiv.innerHTML = "";
-        for (let i = 0; i <= wordIndex && i < text.length; i++) {
-          const span = document.createElement("span");
-          span.textContent = text[i];
-          span.classList.add("word");
-          lyricsDiv.appendChild(span);
-        }
-      }
-    });
-  </script>
+// Démarrage à 75s pour la musique
+audio.currentTime = 75;
+audio.muted = false;
+audio.play();
+
+audio.addEventListener("timeupdate", () => {
+  const t = audio.currentTime;
+  const start = 75 + 7.5; // 82.5s
+  const end = 75 + 12;    // 87s
+  const duration = end - start;
+
+  if (t >= start && t <= end) {
+    const elapsed = t - start;
+    const wordIndex = Math.floor((elapsed / duration) * text.length);
+    
+    lyricsDiv.innerHTML = "";
+    for (let i = 0; i <= wordIndex && i < text.length; i++) {
+      const span = document.createElement("span");
+      span.textContent = text[i] + " ";
+      span.classList.add("word");
+      lyricsDiv.appendChild(span);
+    }
+  } else if (t < start) {
+    lyricsDiv.innerHTML = "";
+  } else if (t > end) {
+    // à la fin, tout affiché
+    lyricsDiv.innerHTML = text.join(" ");
+  }
+});
+</script>
+
 </body>
 </html>
