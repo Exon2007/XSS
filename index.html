@@ -128,6 +128,8 @@ const lyricEnd   = 87;   // 1:27
 const lyricDuration = lyricEnd - lyricStart;
 const exonTime = 78;     // 1:18
 
+let exonPlayed = false;
+
 overlay.addEventListener('click', async () => {
   overlay.style.background = "#000";
   audio.currentTime = musicStart;
@@ -145,8 +147,9 @@ overlay.addEventListener('click', async () => {
     }
 
     // EXON animation
-    if (t >= exonTime && !exon.classList.contains("played")) {
-      exon.classList.add("played");
+    if (t >= exonTime && !exonPlayed) {
+      exonPlayed = true; // pour éviter de le relancer plusieurs fois
+      exon.style.opacity = "1";
 
       // Barres ciné
       topBar.style.top = "0";
