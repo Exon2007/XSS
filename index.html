@@ -2,74 +2,81 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dubstep Lyrics Dynamic</title>
+<title>Dubstep Hacking Lyrics</title>
 <style>
   body {
-    margin:0; background:#000; display:flex;
-    justify-content:center; align-items:center;
-    height:100vh; font-family: 'Orbitron', sans-serif;
-    overflow:hidden; color:#fff;
+    margin:0; padding:0; overflow:hidden;
+    background:#000; color:#0f0;
+    font-family: "Courier New", monospace;
   }
+
+  /* Hitbox plein écran invisible pour cliquer */
+  #overlay {
+    position:fixed; inset:0;
+    background:#000;
+    display:flex; justify-content:center; align-items:center;
+    cursor:pointer; z-index:9999;
+    transition: background 0.8s ease;
+  }
+
+  /* Texte de la phrase */
   #lyrics {
-    font-size:3rem;
-    text-align:center;
-    line-height:1.5;
-    word-wrap: break-word;
-  }
-  .word {
-    display:inline-block;
-    opacity:0;
-    transform:scale(0.5);
-    animation:pop 0.3s ease forwards;
-  }
-  @keyframes pop {
-    0%   { transform:scale(0.5) rotate(-15deg); opacity:0; color:#fff; }
-    50%  { transform:scale(1.5) rotate(5deg); opacity:1; color:#ff00ff; text-shadow:0 0 20px #ff00ff; }
-    100% { transform:scale(1) rotate(0); color:#00ffff; text-shadow:0 0 40px #00ffff; }
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size:2rem; line-height:1.5; white-space:pre-wrap;
+    letter-spacing:2px;
   }
 </style>
 </head>
 <body>
 
-<audio id="song" controls>
-  <source src="musique.mp3" type="audio/mpeg">
-</audio>
+<div id="overlay">
+  <div style="text-align:center;">
+    <div style="color:#0f0; font-size:1.2rem;">Cliquez pour activer la musique</div>
+  </div>
+</div>
 
 <div id="lyrics"></div>
 
+<audio id="song" preload="auto">
+  <source src="musique.mp3" type="audio/mpeg">
+</audio>
+
 <script>
+const overlay = document.getElementById('overlay');
+const audio = document.getElementById('song');
+const lyricsDiv = document.getElementById('lyrics');
+
 const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
-const lyricsDiv = document.getElementById("lyrics");
-const audio = document.getElementById("song");
 
-// Démarrage à 75s pour la musique
-audio.currentTime = 75;
-audio.muted = false;
-audio.play();
+const musicStart = 75; // 1:15
+const lyricStart = 82.5; // 1:22.5
+const lyricEnd = 87;     // 1:27
+const lyricDuration = lyricEnd - lyricStart;
 
-audio.addEventListener("timeupdate", () => {
-  const t = audio.currentTime;
-  const start = 75 + 7.5; // 82.5s
-  const end = 75 + 12;    // 87s
-  const duration = end - start;
+overlay.addEventListener('click', async () => {
+  // Effet TV éteinte : transition écran noir
+  overlay.style.background = "#000";
+  overlay.innerHTML = ""; // retire le texte
+  // Lecture audio
+  audio.currentTime = musicStart;
+  audio.muted = false;
+  await audio.play();
+  overlay.remove(); // supprime l'overlay
 
-  if (t >= start && t <= end) {
-    const elapsed = t - start;
-    const wordIndex = Math.floor((elapsed / duration) * text.length);
-    
-    lyricsDiv.innerHTML = "";
-    for (let i = 0; i <= wordIndex && i < text.length; i++) {
-      const span = document.createElement("span");
-      span.textContent = text[i] + " ";
-      span.classList.add("word");
-      lyricsDiv.appendChild(span);
+  // Boucle pour les lyrics
+  audio.addEventListener("timeupdate", () => {
+    const t = audio.currentTime;
+    if (t >= lyricStart && t <= lyricEnd) {
+      const elapsed = t - lyricStart;
+      const wordIndex = Math.floor((elapsed / lyricDuration) * text.length);
+      lyricsDiv.innerHTML = text.slice(0, wordIndex+1).join(" ");
+    } else if (t < lyricStart) {
+      lyricsDiv.innerHTML = "";
+    } else if (t > lyricEnd) {
+      lyricsDiv.innerHTML = text.join(" ");
     }
-  } else if (t < start) {
-    lyricsDiv.innerHTML = "";
-  } else if (t > end) {
-    // à la fin, tout affiché
-    lyricsDiv.innerHTML = text.join(" ");
-  }
+  });
 });
 </script>
 
