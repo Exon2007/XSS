@@ -2,36 +2,50 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hacking Lyrics with Transition</title>
+<title>TV Cathodique Lyrics</title>
 <style>
-  body {
-    margin:0; padding:0; overflow:hidden;
-    background:#fff; /* écran blanc au départ */
-    font-family: "Courier New", monospace;
-    color:#0f0;
-  }
+body {
+  margin:0; padding:0; overflow:hidden;
+  background:#fff;
+  font-family: "Courier New", monospace;
+  color:#0f0;
+}
 
-  /* Hitbox plein écran pour cliquer */
-  #overlay {
-    position:fixed; inset:0;
-    background:#fff; /* commence blanc */
-    display:flex; justify-content:center; align-items:center;
-    cursor:pointer; z-index:9999;
-    transition: background 2s ease; /* transition vers noir */
-  }
+#overlay {
+  position:fixed; inset:0;
+  background:#fff;
+  display:flex; justify-content:center; align-items:center;
+  cursor:pointer; z-index:9999;
+  transition: background 1.5s ease;
+  transform-origin: center;
+}
 
-  #overlayText {
-    font-size:1.2rem;
-    color:#000;
-  }
+#overlayText {
+  font-size:1.2rem;
+  color:#000;
+}
 
-  /* Texte style hacking */
-  #lyrics {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    font-size:2rem; line-height:1.5; white-space:pre-wrap;
-    letter-spacing:2px;
-  }
+#lyrics {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%) rotateX(0deg) rotateY(0deg);
+  font-size:2rem; line-height:1.5; white-space:pre-wrap;
+  letter-spacing:2px;
+  text-shadow:0 0 1px #0f0, 0 0 2px #0f0;
+  filter: contrast(1.5) brightness(1.1);
+}
+
+/* scanlines */
+#lyrics::before {
+  content:""; position:absolute; inset:0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.05),
+    rgba(0,0,0,0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events:none;
+}
 </style>
 </head>
 <body>
@@ -59,20 +73,29 @@ const lyricStart = 82.5; // 1:22.5
 const lyricEnd = 87;     // 1:27
 const lyricDuration = lyricEnd - lyricStart;
 
-overlay.addEventListener('click', async () => {
-  // Transition écran blanc → noir
-  overlay.style.background = "#000";
-  overlayText.style.color = "#0f0"; // texte vert type hacking
+// effet léger “CRT shake”
+function crtShake() {
+  const x = (Math.random()-0.5)*2; // -1 à 1 deg
+  const y = (Math.random()-0.5)*2;
+  lyricsDiv.style.transform = `translate(-50%,-50%) rotateX(${x}deg) rotateY(${y}deg)`;
+  requestAnimationFrame(crtShake);
+}
 
-  // Lecture audio
+overlay.addEventListener('click', async () => {
+  // fade vers noir avec légère rotation
+  overlay.style.background = "#000";
+  overlayText.style.color = "#0f0";
+
   audio.currentTime = musicStart;
   audio.muted = false;
   await audio.play();
 
-  // Supprime le texte d’instruction après transition
-  setTimeout(() => overlay.remove(), 2000); // laisse 2s pour la transition
+  // supprime l'overlay après 1.5s pour laisser transition
+  setTimeout(() => overlay.remove(), 1500);
 
-  // Boucle pour les lyrics
+  crtShake(); // démarre l’effet CRT shake
+
+  // affichage lyrics
   audio.addEventListener("timeupdate", () => {
     const t = audio.currentTime;
     if (t >= lyricStart && t <= lyricEnd) {
