@@ -1,7 +1,60 @@
-<audio id="bgMusic" autoplay loop muted>
-  <source src="musique.mp3" type="audio/mpeg">
-</audio>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Page musicale</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    #startBtn {
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #ffcc00;
+      color: #333;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #startBtn:hover {
+      background: #ffdb4d;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bienvenue 🎶</h1>
+  <p>Clique sur le bouton pour activer la musique</p>
+  
+  <button id="startBtn">▶ Lancer la musique</button>
 
-<button onclick="document.getElementById('bgMusic').muted=false;">
-  🔊 Activer le son
-</button>
+  <!-- Musique en arrière-plan (chargée muette) -->
+  <audio id="bgMusic" autoplay loop muted>
+    <source src="musique.mp3" type="audio/mpeg">
+    Ton navigateur ne supporte pas l'audio HTML5.
+  </audio>
+
+  <script>
+    const btn = document.getElementById("startBtn");
+    const audio = document.getElementById("bgMusic");
+
+    btn.addEventListener("click", () => {
+      audio.muted = false;   // enlève le mode muet
+      audio.play();          // lance la musique
+      btn.style.display = "none"; // cache le bouton
+    });
+  </script>
+</body>
+</html>
