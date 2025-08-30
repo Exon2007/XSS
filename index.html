@@ -8,7 +8,6 @@ body {
   margin:0; padding:0; overflow:hidden;
   background:#000;
   font-family: "Courier New", monospace;
-  color:#0f0;
 }
 
 /* Overlay */
@@ -45,45 +44,31 @@ body {
 #exon {
   position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  font-size:5rem; font-weight:300; /* plus fin */
-  color:#fff; letter-spacing:1rem;
+  font-size:5rem; font-weight:400;
+  color:#000; letter-spacing:1rem;
   display:flex; gap:0.5rem;
   opacity:0; z-index:3000;
 }
 #exon span {
   display:inline-block;
-  opacity:0;
-  transform:scale(0.8);
+  opacity:1;
 }
 
 /* Animations */
-.fadeIn {
-  animation: fadeIn 0.8s ease forwards;
+.slowLeft {
+  animation: slowLeft 4s linear forwards;
 }
-.fadeOutLeft {
-  animation: fadeOutLeft 1.5s ease forwards;
-}
-.fadeOutRight {
-  animation: fadeOutRight 1.5s ease forwards;
-}
-.fadeOutSofterLeft {
-  animation: fadeOutLeft 2.2s ease forwards;
-}
-.fadeOutSofterRight {
-  animation: fadeOutRight 2.2s ease forwards;
+.slowRight {
+  animation: slowRight 4s linear forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity:0; transform:scale(0.8); }
-  to   { opacity:1; transform:scale(1); }
+@keyframes slowLeft {
+  from { transform:translateX(0); opacity:1; }
+  to   { transform:translateX(-300px); opacity:0; }
 }
-@keyframes fadeOutLeft {
-  from { opacity:1; transform:translateX(0) scale(1); }
-  to   { opacity:0; transform:translateX(-300px) scale(0.9); }
-}
-@keyframes fadeOutRight {
-  from { opacity:1; transform:translateX(0) scale(1); }
-  to   { opacity:0; transform:translateX(300px) scale(0.9); }
+@keyframes slowRight {
+  from { transform:translateX(0); opacity:1; }
+  to   { transform:translateX(300px); opacity:0; }
 }
 </style>
 </head>
@@ -148,25 +133,18 @@ overlay.addEventListener('click', async () => {
 
     // EXON animation
     if (t >= exonTime && !exonPlayed) {
-      exonPlayed = true; // pour éviter de le relancer plusieurs fois
+      exonPlayed = true;
       exon.style.opacity = "1";
 
       // Barres ciné
       topBar.style.top = "0";
       bottomBar.style.bottom = "0";
 
-      // Fade in des lettres
-      [E,X,O,N].forEach((l,i)=> {
-        setTimeout(()=> l.classList.add("fadeIn"), i*150);
-      });
-
-      // Puis fade out vers directions opposées
-      setTimeout(()=>{
-        E.classList.add("fadeOutLeft");
-        N.classList.add("fadeOutRight");
-        X.classList.add("fadeOutSofterLeft");
-        O.classList.add("fadeOutSofterRight");
-      }, 1200);
+      // Toutes les lettres apparaissent direct en noir
+      E.classList.add("slowLeft");
+      X.classList.add("slowLeft");
+      O.classList.add("slowRight");
+      N.classList.add("slowRight");
     }
   });
 });
