@@ -45,7 +45,7 @@ body {
 #exon {
   position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  font-size:5rem; font-weight:400;
+  font-size:10rem; font-weight:400; /* <-- 2x plus grand */
   color:#000; letter-spacing:1rem;
   display:flex; gap:0.5rem;
   opacity:0; z-index:3000;
@@ -54,10 +54,10 @@ body {
 
 /* Animations */
 .slowLeft {
-  animation: slowLeft 4s linear forwards;
+  animation: slowLeft 8s linear forwards; /* <-- plus lent */
 }
 .slowRight {
-  animation: slowRight 4s linear forwards;
+  animation: slowRight 8s linear forwards; /* <-- plus lent */
 }
 
 @keyframes slowLeft {
@@ -140,7 +140,7 @@ overlay.addEventListener('click', async () => {
       topBar.style.top = "0";
       bottomBar.style.bottom = "0";
 
-      // EXON apparaît d'un coup
+      // EXON apparaît brutalement
       exon.style.opacity = "1";
       E.classList.add("slowLeft");
       X.classList.add("slowLeft");
