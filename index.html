@@ -1,90 +1,53 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Musique — Hitbox invisible</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Dubstep Lyrics Sync</title>
   <style>
-    body {
-      margin: 0; font-family: system-ui, sans-serif;
-      min-height: 100vh; display: grid; place-items: center;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
+    body { background:#000; color:#fff; font-family:Orbitron, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; }
+    #lyrics { font-size:2rem; text-align:center; line-height:1.5; }
+    .word {
+      opacity:0;
+      display:inline-block;
+      margin:0 4px;
+      animation: pop 0.4s ease forwards;
     }
-    h1 { margin: 0 0 0.5rem }
-    p { opacity: 0.85; margin: 0 0 1.5rem }
-
-    /* Overlay = hitbox géante et invisible */
-    .sound-overlay {
-      position: fixed; inset: 0;
-      background: transparent;   /* invisible */
-      display: grid; place-items: center;
-      cursor: pointer;           /* indique qu'on peut cliquer */
-      z-index: 9999;
+    @keyframes pop {
+      0%   { transform:scale(0.5) rotate(-15deg); opacity:0; color:#fff; }
+      50%  { transform:scale(1.4) rotate(5deg); opacity:1; color:#ff00ff; text-shadow:0 0 20px #ff00ff; }
+      100% { transform:scale(1) rotate(0); color:#00ffff; text-shadow:0 0 40px #00ffff; }
     }
-
-    /* Bouton visible (facultatif) — le clic marche aussi en dehors */
-    .btn {
-      padding: 12px 22px; border: 0; border-radius: 999px;
-      background: #ffcc00; color: #222; font-weight: 700;
-      box-shadow: 0 8px 24px rgba(0,0,0,.25);
-    }
-    .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-    .hint { font-size: .9rem; opacity: .9; margin-top: .75rem }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Bienvenue 🎶</h1>
-    <p>Musique de fond (démarre à 1:15 après votre clic)</p>
-  </main>
-
-  <!-- Audio préchargé, muet par défaut -->
-  <audio id="bgMusic" preload="auto" loop muted>
+  <audio id="song" controls>
     <source src="musique.mp3" type="audio/mpeg">
   </audio>
-
-  <!-- Overlay = hitbox plein écran, mais on affiche un bouton au centre -->
-  <div id="soundOverlay" class="sound-overlay"
-       role="button"
-       aria-label="Activer le son (cliquer n'importe où)">
-    <div style="text-align:center;">
-      <button class="btn" type="button">🔊 Activer le son</button>
-      <div class="hint">(vous pouvez aussi cliquer n’importe où)</div>
-    </div>
-  </div>
+  <div id="lyrics"></div>
 
   <script>
-    const overlay = document.getElementById('soundOverlay');
-    const audio   = document.getElementById('bgMusic');
+    const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
+    const lyricsDiv = document.getElementById("lyrics");
+    const audio = document.getElementById("song");
 
-    async function enableSound() {
-      try {
-        // Place le curseur à 1:15 (75s) au premier geste utilisateur
-        // On attend metadata si nécessaire
-        if (isNaN(audio.duration) || audio.duration === Infinity) {
-          await new Promise(resolve => {
-            const onMeta = () => { audio.removeEventListener('loadedmetadata', onMeta); resolve(); };
-            audio.addEventListener('loadedmetadata', onMeta, { once: true });
-          });
+    audio.addEventListener("timeupdate", () => {
+      const t = audio.currentTime;
+      const start = 22.5;
+      const duration = 6;
+      const end = start + duration;
+
+      if (t >= start && t <= end) {
+        const elapsed = t - start;
+        const wordIndex = Math.floor((elapsed / duration) * text.length);
+
+        lyricsDiv.innerHTML = "";
+        for (let i = 0; i <= wordIndex && i < text.length; i++) {
+          const span = document.createElement("span");
+          span.textContent = text[i];
+          span.classList.add("word");
+          lyricsDiv.appendChild(span);
         }
-        audio.currentTime = Math.min(75, (audio.duration || 1) - 0.1); // sécurité si durée < 75s
-        audio.muted = false;
-        await audio.play();
-      } catch(e) {
-        // Si le play échoue, on reste muet et on réessaie au prochain clic
-        console.warn('Lecture bloquée :', e);
-        return;
       }
-      // Retire la hitbox géante après succès
-      overlay.remove();
-    }
-
-    // Un clic n'importe où sur l'overlay déclenche l'activation
-    overlay.addEventListener('click', enableSound);
-    // Accessibilité clavier
-    overlay.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enableSound(); }
     });
   </script>
 </body>
