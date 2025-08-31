@@ -2,24 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>EXON Cinematic</title>
+<title>EXON1 Cinematic</title>
 <style>
 body {
   margin:0; padding:0; overflow:hidden;
   background:#000;
   font-family: "Courier New", monospace;
-  transition: background 1s ease-in-out;
 }
-
-/* Overlay */
-#overlay {
-  position:fixed; inset:0;
-  background:#fff;
-  display:flex; justify-content:center; align-items:center;
-  cursor:pointer; z-index:9999;
-  transition: background 0.8s ease;
-}
-#overlayText { font-size:1.2rem; color:#000; }
 
 /* Lyrics */
 #lyrics {
@@ -36,16 +25,16 @@ body {
   position:fixed; left:0; right:0;
   height:20%; background:#000;
   z-index:2000;
-  transition: all 1.5s ease-in-out;
+  transition: all 4s linear;
 }
-#topBar { top:-20%; }
-#bottomBar { bottom:-20%; }
+#topBar { top:0; }
+#bottomBar { bottom:0; }
 
 /* Texte EXON */
 #exon {
   position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  font-size:10rem; font-weight:400; /* <-- 2x plus grand */
+  font-size:10rem; font-weight:400;
   color:#000; letter-spacing:1rem;
   display:flex; gap:0.5rem;
   opacity:0; z-index:3000;
@@ -53,28 +42,38 @@ body {
 #exon span { display:inline-block; }
 
 /* Animations */
+.fastLeft {
+  animation: fastLeft 4s linear forwards;
+}
+.fastRight {
+  animation: fastRight 4s linear forwards;
+}
 .slowLeft {
-  animation: slowLeft 8s linear forwards; /* <-- plus lent */
+  animation: slowLeft 6s linear forwards;
 }
 .slowRight {
-  animation: slowRight 8s linear forwards; /* <-- plus lent */
+  animation: slowRight 6s linear forwards;
 }
 
+@keyframes fastLeft {
+  from { transform:translateX(0); opacity:1; }
+  to   { transform:translateX(-500px); opacity:0; }
+}
+@keyframes fastRight {
+  from { transform:translateX(0); opacity:1; }
+  to   { transform:translateX(500px); opacity:0; }
+}
 @keyframes slowLeft {
   from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(-300px); opacity:0; }
+  to   { transform:translateX(-250px); opacity:0; }
 }
 @keyframes slowRight {
   from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(300px); opacity:0; }
+  to   { transform:translateX(250px); opacity:0; }
 }
 </style>
 </head>
 <body>
-
-<div id="overlay">
-  <div id="overlayText">Cliquez pour activer la musique</div>
-</div>
 
 <div id="lyrics"></div>
 <div id="topBar"></div>
@@ -91,7 +90,6 @@ body {
 </audio>
 
 <script>
-const overlay = document.getElementById('overlay');
 const audio = document.getElementById('song');
 const lyricsDiv = document.getElementById('lyrics');
 
@@ -113,11 +111,10 @@ const exonTime = 78;     // 1:18
 
 let exonPlayed = false;
 
-overlay.addEventListener('click', async () => {
-  overlay.style.background = "#000";
+// Autoplay après clic
+document.body.addEventListener('click', async () => {
   audio.currentTime = musicStart;
   await audio.play();
-  setTimeout(()=> overlay.remove(), 800);
 
   audio.addEventListener("timeupdate", () => {
     const t = audio.currentTime;
@@ -133,19 +130,21 @@ overlay.addEventListener('click', async () => {
     if (t >= exonTime && !exonPlayed) {
       exonPlayed = true;
 
-      // change fond en blanc
+      // Fond blanc immédiat
       document.body.style.background = "#fff";
 
-      // Barres ciné
-      topBar.style.top = "0";
-      bottomBar.style.bottom = "0";
+      // Les barres se resserrent
+      topBar.style.top = "30%";
+      bottomBar.style.bottom = "30%";
 
       // EXON apparaît brutalement
       exon.style.opacity = "1";
-      E.classList.add("slowLeft");
+
+      // E et N rapides, X et O plus lents
+      E.classList.add("fastLeft");
+      N.classList.add("fastRight");
       X.classList.add("slowLeft");
       O.classList.add("slowRight");
-      N.classList.add("slowRight");
     }
   });
 });
