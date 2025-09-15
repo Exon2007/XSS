@@ -1,1 +1,1 @@
-alert('eXXson')
+alert(document.cookie)
