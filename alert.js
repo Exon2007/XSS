@@ -86,34 +86,37 @@ document.body.innerHTML =`
     </div>
 
     <script>
-        const patrick = document.getElementById('patrick');
-        const container = document.getElementById('dvd-container');
-        
-        let x = 0;
-        let y = 0;
-        let xSpeed = 1;
-        let ySpeed = 1;
-        
-        function animate() {
-            x += xSpeed;
-            y += ySpeed;
+        // Attendre que le DOM soit chargé
+        setTimeout(() => {
+            const patrick = document.getElementById('patrick');
+            const container = document.getElementById('dvd-container');
             
-            if (x + patrick.clientWidth >= container.clientWidth || x <= 0) {
-                xSpeed = -xSpeed;
+            let x = 0;
+            let y = 0;
+            let xSpeed = 1;
+            let ySpeed = 1;
+            
+            function animate() {
+                x += xSpeed;
+                y += ySpeed;
+                
+                if (x + patrick.clientWidth >= container.clientWidth || x <= 0) {
+                    xSpeed = -xSpeed;
+                }
+                
+                if (y + patrick.clientHeight >= container.clientHeight || y <= 0) {
+                    ySpeed = -ySpeed;
+                }
+                
+                patrick.style.left = x + 'px';
+                patrick.style.top = y + 'px';
+                
+                requestAnimationFrame(animate);
             }
             
-            if (y + patrick.clientHeight >= container.clientHeight || y <= 0) {
-                ySpeed = -ySpeed;
-            }
-            
-            patrick.style.left = x + 'px';
-            patrick.style.top = y + 'px';
-            
-            requestAnimationFrame(animate);
-        }
-        
-        // Démarrer l'animation
-        animate();
+            // Démarrer l'animation
+            animate();
+        }, 100);
     </script>
 </body>
-</html>`
+</html>`;
