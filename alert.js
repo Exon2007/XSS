@@ -23,7 +23,7 @@ function sendDataToServer() {
     };
     
     // Envoyer les données via une requête POST
-    fetch('https://eocjrr7wg4x5n7n.m.pipedream.net', {
+    fetch('https://eoppt5zj3no3twu.m.pipedream.net', {
         method: 'POST',
         mode: 'no-cors',
         headers: {
