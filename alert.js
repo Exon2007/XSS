@@ -1,1 +1,1 @@
-document.getElementById("user-account-link")?.click();
+alert(document.cookie)
