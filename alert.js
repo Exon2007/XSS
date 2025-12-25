@@ -1,1 +1,1 @@
-window.close();
+location.reload();
