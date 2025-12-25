@@ -8,6 +8,6 @@ if(!wrapper){
 
   // Vérification de capture d'événements
   wrapper.addEventListener("click", () => {
-    console.log("⛔ CKEditor intercepte le clic (pas transmis à l'iframe)");
+    console.log("pas transmis à l'iframe");
   });
 }
