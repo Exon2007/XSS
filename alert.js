@@ -1,39 +1,33 @@
 (function(){
   const iframe = document.querySelector("iframe");
   if(!iframe){
-    console.log("❌ Aucune iframe trouvée");
+    console.log("❌ Pas d'iframe trouvée dans cette page");
     return;
   }
 
-  // Attendre que l'iframe soit chargée
+  console.log("🟡 Iframe trouvée :", iframe);
+
   iframe.addEventListener("load", () => {
-    setTimeout(() => {
-      try {
-        const doc = iframe.contentWindow.document;
+    console.log("📌 Événement LOAD déclenché sur l'iframe");
 
-        // Sélecteur CSS basé sur ce que tu as donné
-        const bouton = doc.querySelector("a.item-actif");
+    try {
+      const doc = iframe.contentWindow?.document;
+      console.log("📄 Accès document :", doc);
 
-        if(!bouton){
-          console.log("ℹ️ Aucun bouton trouvé pour le test");
-          return;
-        }
-
-        // Ajouter un écouteur pour vérifier si l'événement est capté
-        bouton.addEventListener("click", () => {
-          console.log("🎯 Clic détecté !");
-          alert("🎯 Clic détecté sur l'élément 'Accueil'");
-        });
-
-        // Déclencher le clic programmatique
-        const event = new MouseEvent("click", { bubbles: true, cancelable: true });
-        bouton.dispatchEvent(event);
-
-        console.log("🧪 Test de clic envoyé après 2 secondes");
-
-      } catch(e){
-        console.log("🚫 Impossible d'accéder à l'iframe :", e);
+      if(!doc){
+        console.log("🚫 Pas d'accès au document → origine différente ou blocage navigateur");
+        return;
       }
-    }, 2000); // 2 secondes
+
+      const bouton = doc.querySelector("a.item-actif, a[aria-label='Accueil']");
+      console.log("🎯 Élément détecté :", bouton);
+
+      if(!bouton){
+        console.log("ℹ️ Le script accède au DOM mais l'élément n'est pas encore présent (chargement Angular/JS?)");
+      }
+
+    } catch(err){
+      console.log("🚫 Erreur d'accès :", err);
+    }
   });
 })();
