@@ -1,1 +1,1 @@
-location.reload();
+console.log("helloworld")
