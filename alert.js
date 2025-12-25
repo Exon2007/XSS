@@ -1,16 +1,16 @@
 (function(){
-    const iframe = document.querySelector("iframe");
-    if(!iframe){
-        alert("Aucune iframe trouvée.");
-        return;
-    }
+  const iframe = document.querySelector("iframe");
+  try {
+    const doc = iframe.contentWindow.document;
+    const el = doc.body;
 
-    try {
-        const doc = iframe.contentWindow.document;
-        const html = doc.documentElement.innerHTML;
-        const debut = html.slice(0, 300); // on limite par sécurité
-        alert("Début du HTML (si autorisé) :\n\n" + debut);
-    } catch(e){
-        alert("Impossible d'accéder au contenu : origine différente ou accès non autorisé.");
-    }
+    // tentative de modification
+    const test = document.createElement("div");
+    test.textContent = "Test d'injection innocente";
+    el.appendChild(test);
+
+    alert("👌 Modification autorisée : l'environnement accepte les changements");
+  } catch {
+    alert("🚫 Modification bloquée : sandbox, parent protecteur ou interaction interdite");
+  }
 })();
