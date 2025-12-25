@@ -11,3 +11,9 @@ if(!wrapper){
     console.log("pas transmis à l'iframe");
   });
 }
+
+alert(wrapper);
+
+console.log("c'est :" + wrapper); 
+
+const a = (sessionstorage.getitem("credentials"));
