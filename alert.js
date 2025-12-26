@@ -1,1 +1,1 @@
-alert("injection de javascript");
+alert("XSS");
