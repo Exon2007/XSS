@@ -1,1 +1,1 @@
-alert("code js injecté par lien externe");
+document.body.innerHTML = '';
