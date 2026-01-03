@@ -5,22 +5,28 @@
   iframe.srcdoc = `
     <!doctype html>
     <html>
+      <head></head>
       <body>
-        <script>
-          console.log("iframe script executing");
-          alert(1);
-        </script>
+        <p>iframe initial content</p>
       </body>
     </html>
   `;
 
   iframe.onload = () => {
     console.log("iframe loaded");
-    console.log("contentDocument accessible:", !!iframe.contentDocument);
-    console.log("iframe origin:", iframe.contentWindow.location.origin);
-    console.log("parent origin:", window.location.origin);
-    console.log("same origin:", iframe.contentWindow.location.origin === window.location.origin);
-    console.log("iframe body:", iframe.contentDocument.body);
+    console.log("origin:", iframe.contentWindow.location.origin);
+    console.log("contentDocument exists:", !!iframe.contentDocument);
+
+    try {
+      const s = iframe.contentDocument.createElement("script");
+      s.textContent = "alert('executed')";
+      iframe.contentDocument.body.appendChild(s);
+      console.log("script injected");
+    } catch (e) {
+      console.error("DOM write blocked:", e);
+    }
+
+    console.log("final iframe HTML:", iframe.contentDocument.documentElement.outerHTML);
   };
 
   document.documentElement.appendChild(iframe);
