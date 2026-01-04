@@ -2,16 +2,6 @@
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
 
-  iframe.srcdoc = `
-    <!doctype html>
-    <html>
-      <head></head>
-      <body>
-        <p>iframe initial content</p>
-      </body>
-    </html>
-  `;
-
   iframe.onload = () => {
     console.log("iframe loaded");
     console.log("origin:", iframe.contentWindow.location.origin);
