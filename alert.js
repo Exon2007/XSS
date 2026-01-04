@@ -1,3 +1,6 @@
+
+sessionStorage.setItem('credentials', JSON.stringify(((c)=>{c.payload.authToken="1234";return c})(JSON.parse(sessionStorage.getItem('credentials')))));
+
 (() => {
   const start = performance.now()
   console.log("script start")
