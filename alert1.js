@@ -4,7 +4,7 @@ const observer = new MutationObserver(() => {
     observer.disconnect(); // arrête la surveillance pour ne pas répéter
     setTimeout(() => {
       alert(pwdInput.value);
-    }, 2000); // attente de 1000 ms (1 seconde) 
+    }, 5000); // attente de 1000 ms (1 seconde) 
   }
 });
 
