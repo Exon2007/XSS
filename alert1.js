@@ -1,7 +1,11 @@
-new MutationObserver(() => {
-  const modal = document.querySelector('ed-modal-reconnexion');
-  const pwd = document.getElementById('password');
-  if (modal && pwd) {
-    alert(pwd.value);
+const observer = new MutationObserver(() => {
+  const pwdInput = document.querySelector('.mdp input[type="password"]');
+  if (pwdInput) {
+    observer.disconnect(); // arrête la surveillance pour ne pas répéter
+    setTimeout(() => {
+      alert(pwdInput.value);
+    }, 2000); // attente de 1000 ms (1 seconde) 
   }
-}).observe(document.body, { childList: true, subtree: true });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
