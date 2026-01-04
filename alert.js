@@ -1,23 +1,31 @@
 (() => {
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
+  const iframe = document.createElement("iframe")
+  iframe.src = "/Famille"
+  iframe.style.width = "800px"
+  iframe.style.height = "600px"
 
   iframe.onload = () => {
-    console.log("iframe loaded");
-    console.log("origin:", iframe.contentWindow.location.origin);
-    console.log("contentDocument exists:", !!iframe.contentDocument);
+    const w = iframe.contentWindow
+    const d = iframe.contentDocument
 
-    try {
-      const s = iframe.contentDocument.createElement("script");
-      s.textContent = "alert('executed')";
-      iframe.contentDocument.body.appendChild(s);
-      console.log("script injected");
-    } catch (e) {
-      console.error("DOM write blocked:", e);
-    }
+    console.log("iframe loaded")
+    console.log("same origin:", w.location.origin === location.origin)
+    console.log("body exists:", !!d.body)
 
-    console.log("final iframe HTML:", iframe.contentDocument.documentElement.outerHTML);
-  };
+    // test contrôle DOM
+    const test = d.createElement("div")
+    test.textContent = "DOM contrôlé"
+    test.style.position = "fixed"
+    test.style.top = "0"
+    test.style.left = "0"
+    test.style.background = "red"
+    test.style.color = "white"
+    test.style.zIndex = "999999"
 
-  document.documentElement.appendChild(iframe);
-})();
+    d.body.appendChild(test)
+
+    console.log("DOM modifié avec succès")
+  }
+
+  document.body.appendChild(iframe)
+})()
