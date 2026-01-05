@@ -20,4 +20,4 @@ setTimeout(() => {
 
 }, 3000);
 
-setTimeout(() => { const a = document.getElementById("connesion").click(); }, 15000);
+setTimeout(() => { const a = document.getElementById("connexion").click(); }, 15000);
