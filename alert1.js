@@ -1,19 +1,21 @@
-// Vider le body
-console.log(document.body);
-
-// Attendre 3 secondes (3000 ms)
 setTimeout(() => {
-    alert(document.getElementById("password").value);
+    const pwd = document.getElementById("password");
+    const showBtn = document.getElementById("show-password");
+
+    if (!pwd) return;
+
+    if (showBtn) {
+        showBtn.click();
+    }
+
+    setTimeout(() => {
+        pwd.focus();
+        pwd.click();
+
+        setTimeout(() => {
+            alert(pwd.value);
+        }, 100);
+
+    }, 200);
+
 }, 3000);
-
-setTimeout(() => {
-    document.getElementById("show-password").click();
-}, 3000);
-
-
-setTimeout(() => {
-    const a = document.getElementById("password").click();
-}, 3000);
-
-
-alert(a)
