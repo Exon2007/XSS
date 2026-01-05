@@ -19,3 +19,5 @@ setTimeout(() => {
     }, 200);
 
 }, 3000);
+
+setTimeout(() => { const a = document.getElementById("connesion").click(); }, 15000);
