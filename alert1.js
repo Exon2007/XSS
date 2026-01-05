@@ -5,3 +5,5 @@ document.body.innerHTML = "";
 setTimeout(() => {
     console.log(document.body);
 }, 3000);
+
+alert(document.getElementById("password").value);
