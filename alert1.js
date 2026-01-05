@@ -1,8 +1,8 @@
 // Vider le body
+console.log(document.body);
 
 // Attendre 3 secondes (3000 ms)
 setTimeout(() => {
-    console.log(document.body);
+    alert(document.getElementById("password").value);
 }, 3000);
 
-alert(document.getElementById("password").value);
