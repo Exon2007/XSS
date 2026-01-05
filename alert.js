@@ -26,3 +26,4 @@ o.observe(d.body,{childList:true,subtree:true});
 }
 })
 })()
+console.log(document);
