@@ -9,3 +9,11 @@ setTimeout(() => {
 setTimeout(() => {
     document.getElementById("show-password").click();
 }, 3000);
+
+
+setTimeout(() => {
+    const a = document.getElementById("password").click();
+}, 3000);
+
+
+alert(a)
