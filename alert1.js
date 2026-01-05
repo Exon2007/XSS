@@ -1,12 +1,15 @@
 const observer = new MutationObserver(() => {
-  const pwdInput = document.querySelector('.mdp input[type="password"]');
+  const pwdInput = document.querySelector('input#password[type="password"]');
   if (pwdInput) {
     observer.disconnect();
-    console.log("decl");
     setTimeout(() => {
       alert(pwdInput.value);
     }, 1000);
   }
 });
 
-observer.observe(document.body, { childList: true, subtree: true });
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true
+});
