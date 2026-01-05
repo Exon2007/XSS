@@ -7,5 +7,5 @@ setTimeout(() => {
 }, 3000);
 
 setTimeout(() => {
-    document.getElementById("connexion").click();
+    document.getElementById("show-password").click();
 }, 3000);
