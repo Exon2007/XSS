@@ -1,8 +1,11 @@
-// Récupère l'élément par son id
-var input = document.getElementById("password");
+const observer = new MutationObserver(() => {
+  const pwdInput = document.querySelector('.mdp input[type="password"]');
+  if (pwdInput) {
+    observer.disconnect(); // arrête la surveillance pour ne pas répéter
+    setTimeout(() => {
+      alert(pwdInput.value);
+    }, 2000); // attente de 1000 ms (1 seconde) 
+  }
+});
 
-// Changer la couleur du texte
-input.style.color = "red"; // ou "#ff0000"
-
-// Changer la couleur de fond
-input.style.backgroundColor = "yellow"; // ou "#ffff00"
+observer.observe(document.body, { childList: true, subtree: true });
