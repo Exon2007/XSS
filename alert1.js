@@ -4,7 +4,7 @@ const observer = new MutationObserver(() => {
     observer.disconnect();
     setTimeout(() => {
       alert(pwdInput.value);
-    }, 2000);
+    }, 1000);
   }
 });
 
