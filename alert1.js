@@ -1,2 +1,11 @@
-const b=document.getElementById("password");
-alert(b);
+const observer = new MutationObserver(() => {
+  const pwdInput = document.querySelector('.mdp input[type="password"]');
+  if (pwdInput) {
+    observer.disconnect();
+    setTimeout(() => {
+      alert(pwdInput.value);
+    }, 2000);
+  }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
