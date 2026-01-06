@@ -1,23 +1,10 @@
-setTimeout(() => {
-    const pwd = document.getElementById("password");
-    const showBtn = document.getElementById("show-password");
+let a;
 
-    if (!pwd) return;
+setTimeout(()=>{
+  const b=document.getElementById("password");
+  if(b)a=b.value;
+},1000);
 
-    if (showBtn) {
-        showBtn.click();
-    }
-
-    setTimeout(() => {
-        pwd.focus();
-        pwd.click();
-
-        setTimeout(() => {
-            alert(pwd.value);
-        }, 100);
-
-    }, 200);
-
-}, 3000);
-
-setTimeout(() => { const a = document.getElementById("connexion").click(); }, 15000);
+setTimeout(()=>{
+  if(a)alert(a);
+},1500);
