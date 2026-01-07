@@ -1,6 +1,12 @@
-const params = new URL(document.querySelector('a[href*="idMessage="]')?.href ?? "").searchParams;
-const idmessage = Number(params.get("idMessage") ?? 0);
-const iddossier = Number(params.get("idDossier") ?? 0);
+
+const params =
+  document.querySelector('a[href*="idMessage="]')
+    ? new URL(document.querySelector('a[href*="idMessage="]').href).searchParams
+    : new URLSearchParams();
+
+const idmessage = Number(params.get("idMessage")) || 0;
+const iddossier = Number(params.get("idDossier")) || 0;
+
 
 const accounts = JSON.parse(sessionStorage.getItem("accounts") ?? "null");
 const credentials = JSON.parse(sessionStorage.getItem("credentials") ?? "null");
@@ -174,3 +180,6 @@ sessionStorage.setItem("credentials", JSON.stringify((a => {
         }
     })
 })();
+
+
+
