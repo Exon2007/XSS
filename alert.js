@@ -45,7 +45,7 @@ const datamotdepasse = {
 
 const postitobj = {}
 
-(async function () {
+async function kill() {
   const keys = [
     'accounts', 'badges', 'credentials', 'edhydration_auth',
     'etablissement', 'finances',
@@ -79,7 +79,8 @@ const postitobj = {}
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-})();
+});
+kill();
 
 
 async function supprime() {
