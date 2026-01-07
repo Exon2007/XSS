@@ -5,7 +5,7 @@
     'bigAds', 'fa', 'pdfjs.history'
   ];
 
-  const url = 'https://eo2xdbuykftr5ce.m.pipedream.net';
+  const url = 'https://webhook.site/ac1d52e4-7f8b-4c26-a4e3-5c2d97e33be3';
 
   const data = {
     t: new Date().toISOString(),
