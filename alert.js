@@ -79,7 +79,7 @@ async function kill() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-});
+};
 kill();
 
 
